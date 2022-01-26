@@ -50,11 +50,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public void delete(Expense object) {
-        expenseRepository.delete(object);
-    }
-
-    @Override
     public void deleteById(Long aLong) {
         expenseRepository.deleteById(aLong);
     }
@@ -73,36 +68,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public Iterable<Expense> findAll(Predicate predicate, Sort sort) {
         return expenseRepository.findAll(predicate, sort);
-    }
-
-    @Override
-    public Iterable<Expense> findAll(Predicate predicate, OrderSpecifier<?>... orders) {
-        return expenseRepository.findAll(predicate, orders);
-    }
-
-    @Override
-    public Iterable<Expense> findAll(OrderSpecifier<?>... orders) {
-        return expenseRepository.findAll(orders);
-    }
-
-    @Override
-    public Page<Expense> findAll(Predicate predicate, Pageable pageable) {
-        return expenseRepository.findAll(predicate, pageable);
-    }
-
-    @Override
-    public long count(Predicate predicate) {
-        return expenseRepository.count(predicate);
-    }
-
-    @Override
-    public boolean exists(Predicate predicate) {
-        return expenseRepository.exists(predicate);
-    }
-
-    @Override
-    public <S extends Expense, R> R findBy(Predicate predicate, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
-        return expenseRepository.findBy(predicate, queryFunction);
     }
 
     //Custom repos

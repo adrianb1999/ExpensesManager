@@ -11,7 +11,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
 
-//TODO TREBUIE MODIFICARE PUT-URILE PENTRU CA AM ADAUGAT CHESTII NOI!
 @RestController
 public class UserController {
 
@@ -67,6 +66,7 @@ public class UserController {
 
     @PostMapping("/createUser")
     public User createUser(@RequestBody User user) {
+        //TODO Check if user already exists!
         User newUser = new User();
         newUser.setUsername(user.getUsername());
         newUser.setPassword(user.getPassword());
@@ -79,7 +79,6 @@ public class UserController {
     public Expense addUserExpense(@PathVariable Long id, @RequestBody Expense expense) {
 
         User currentUser = userService.findById(id);
-
         expense.setUsers(currentUser);
 
         return expenseService.save(expense);
