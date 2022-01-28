@@ -1,5 +1,6 @@
 package com.adrian99.expensesManager.jwt;
 
+import com.adrian99.expensesManager.auth.ApplicationUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
 import io.jsonwebtoken.Jwts;
@@ -46,7 +47,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -65,5 +65,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .compact();
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+
     }
 }

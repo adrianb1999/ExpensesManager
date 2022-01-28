@@ -25,7 +25,7 @@ public class ExpenseController {
                                  @RequestParam(name = "dateAfter", required = false) String dateAfter,
                                  @RequestParam(name = "dateBefore", required = false) String dateBefore,
                                  @RequestParam(name = "payMethod", required = false) PayMethod payMethod,
-                                 @RequestParam(name = "categories", required = false) List<String> categories,
+                                 @RequestParam(name = "category", required = false) Category category,
                                  @RequestParam(name = "sortBy", required = false) SortBy sortBy,
                                  @RequestParam(name = "sortType", required = false) SortTypes sortType) {
         return expenseService.findAllByFilters(null,
@@ -36,7 +36,7 @@ public class ExpenseController {
                 dateAfter,
                 dateBefore,
                 payMethod,
-                categories,
+                category,
                 sortBy,
                 sortType);
     }

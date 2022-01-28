@@ -13,8 +13,8 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Category> categories = new ArrayList<>();
+    @Enumerated(value = EnumType.STRING)
+    private Category category;
 
     private LocalDate date;
 
@@ -31,8 +31,8 @@ public class Expense {
     public Expense() {
     }
 
-    public Expense(List<Category> categories, LocalDate date, PayMethod payMethod, Double amount, String details) {
-        this.categories = categories;
+    public Expense(Category category, LocalDate date, PayMethod payMethod, Double amount, String details) {
+        this.category = category;
         this.date = date;
         this.payMethod = payMethod;
         this.amount = amount;
@@ -47,12 +47,12 @@ public class Expense {
         this.id = id;
     }
 
-    public List<Category> getCategories() {
-        return categories;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public LocalDate getDate() {
