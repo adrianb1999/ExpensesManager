@@ -1,5 +1,6 @@
 package com.adrian99.expensesManager.repositories.custom;
 
+import com.adrian99.expensesManager.model.Category;
 import com.adrian99.expensesManager.model.Expense;
 import com.adrian99.expensesManager.model.PayMethod;
 import com.adrian99.expensesManager.customQueries.SortBy;
@@ -16,7 +17,7 @@ public interface ExpenseCustomRepository {
                                    String dateAfter,
                                    String dateBefore,
                                    PayMethod payMethod,
-                                   List<String> categories,
+                                   Category category,
                                    SortBy sortBy,
                                    SortTypes sortType);
 }

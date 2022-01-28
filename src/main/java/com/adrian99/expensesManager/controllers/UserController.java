@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class UserController {
@@ -32,23 +31,19 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @GetMapping("/users/{id}/expenses")
-    public List<Expense> findUserExpenses(@PathVariable Long id,
-                                          @RequestParam(name = "amount", required = false) Double amount,
+    @GetMapping("/users/expenses")
+    public List<Expense> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
                                           @RequestParam(name = "amountLessThan", required = false) Double amountLessThan,
                                           @RequestParam(name = "amountGreaterThan", required = false) Double amountGreaterThan,
                                           @RequestParam(name = "date", required = false) String date,
                                           @RequestParam(name = "dateAfter", required = false) String dateAfter,
                                           @RequestParam(name = "dateBefore", required = false) String dateBefore,
                                           @RequestParam(name = "payMethod", required = false) PayMethod payMethod,
-                                          @RequestParam(name = "categories", required = false) List<String> categories,
+                                          @RequestParam(name = "category", required = false) Category category,
                                           @RequestParam(name = "sortBy", required = false) SortBy sortBy,
                                           @RequestParam(name = "sortType", required = false) SortTypes sortType,
                                           Principal principal) {
-
-        if (!Objects.equals(userService.findByUsername(principal.getName()).getId(), id))
-            return null;
-
+        Long id = userService.findByUsername(principal.getName()).getId();
         return expenseService.findAllByFilters(
                 id,
                 amount,
@@ -58,7 +53,7 @@ public class UserController {
                 dateAfter,
                 dateBefore,
                 payMethod,
-                categories,
+                category,
                 sortBy,
                 sortType
         );
@@ -66,7 +61,10 @@ public class UserController {
 
     @PostMapping("/createUser")
     public User createUser(@RequestBody User user) {
-        //TODO Check if user already exists!
+
+        if(userService.findByUsername(user.getUsername()) != null)
+            return null;
+
         User newUser = new User();
         newUser.setUsername(user.getUsername());
         newUser.setPassword(user.getPassword());
@@ -75,10 +73,10 @@ public class UserController {
         return userService.save(newUser);
     }
 
-    @PostMapping("/users/{id}/expenses")
-    public Expense addUserExpense(@PathVariable Long id, @RequestBody Expense expense) {
+    @PostMapping("/users/expenses")
+    public Expense addUserExpense(@RequestBody Expense expense, Principal principal) {
 
-        User currentUser = userService.findById(id);
+        User currentUser = userService.findByUsername(principal.getName());
         expense.setUsers(currentUser);
 
         return expenseService.save(expense);

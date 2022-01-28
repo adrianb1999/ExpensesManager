@@ -1,22 +1,17 @@
 package com.adrian99.expensesManager.customQueries;
 
 import com.adrian99.expensesManager.model.*;
-import com.adrian99.expensesManager.model.QCategory;
 import com.adrian99.expensesManager.model.QExpense;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.data.querydsl.QSort;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ExpenseQueries {
-
 
     EntityManager em;
 
@@ -43,7 +38,7 @@ public class ExpenseQueries {
                                           String dateAfter,
                                           String dateBefore,
                                           PayMethod payMethod,
-                                          List<String> categories) {
+                                          Category category) {
         QExpense qExpense = QExpense.expense;
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -53,8 +48,8 @@ public class ExpenseQueries {
         booleanBuilder.and(amountPredicate(amount, amountLessThan, amountGreaterThan));
         booleanBuilder.and(datePredicate(date, dateAfter, dateBefore));
 
-        if (categories != null)
-            booleanBuilder.and(categoriesPredicate(categories));
+        if (category != null)
+            booleanBuilder.and(qExpense.category.eq(category));
 
         if (payMethod != null)
             booleanBuilder.and(qExpense.payMethod.eq(payMethod));
@@ -105,30 +100,5 @@ public class ExpenseQueries {
         }
 
         return null;
-    }
-
-
-    private BooleanBuilder categoriesPredicate(List<String> categories) {
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-
-        QExpense qExpense = QExpense.expense;
-        List<Category> categoryList = new ArrayList<>();
-
-        for (String name : categories) {
-            JPAQuery<Category> query = new JPAQuery<>(em);
-            QCategory qCategory = QCategory.category;
-
-            Category category = query.select(qCategory)
-                    .from(qCategory)
-                    .where(qCategory.name.eq(name))
-                    .fetchOne();
-
-            categoryList.add(category);
-        }
-
-        categoryList.forEach(category ->
-                booleanBuilder.or(qExpense.categories.contains(category)));
-
-        return booleanBuilder;
     }
 }

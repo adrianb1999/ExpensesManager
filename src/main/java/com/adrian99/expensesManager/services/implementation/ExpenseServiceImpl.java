@@ -1,24 +1,20 @@
 package com.adrian99.expensesManager.services.implementation;
 
 import com.adrian99.expensesManager.customQueries.ExpenseQueries;
+import com.adrian99.expensesManager.model.Category;
 import com.adrian99.expensesManager.model.Expense;
 import com.adrian99.expensesManager.model.PayMethod;
 import com.adrian99.expensesManager.customQueries.SortBy;
 import com.adrian99.expensesManager.customQueries.SortTypes;
 import com.adrian99.expensesManager.repositories.ExpenseRepository;
 import com.adrian99.expensesManager.services.ExpenseService;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -80,14 +76,14 @@ public class ExpenseServiceImpl implements ExpenseService {
                                           String dateAfter,
                                           String dateBefore,
                                           PayMethod payMethod,
-                                          List<String> categories,
+                                          Category category,
                                           SortBy sortBy,
                                           SortTypes sortType) {
         if (sortBy == null)
             return (List<Expense>)
                     findAll(expenseQueries
                             .customPredicate(
-                                    null,
+                                    userId,
                                     amount,
                                     amountLessThan,
                                     amountGreaterThan,
@@ -95,10 +91,10 @@ public class ExpenseServiceImpl implements ExpenseService {
                                     dateAfter,
                                     dateBefore,
                                     payMethod,
-                                    categories));
+                                    category));
         return (List<Expense>) findAll(expenseQueries
                         .customPredicate(
-                                null,
+                                userId,
                                 amount,
                                 amountLessThan,
                                 amountGreaterThan,
@@ -106,7 +102,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                                 dateAfter,
                                 dateBefore,
                                 payMethod,
-                                categories),
+                                category),
                 ExpenseQueries.sort(sortBy, sortType == null ? SortTypes.ASC : sortType));
     }
 }
