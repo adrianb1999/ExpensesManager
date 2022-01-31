@@ -12,7 +12,6 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +27,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     //CurdRepo Methods
-    @Override
-    public List<Expense> findAll() {
-        List<Expense> expenses = new ArrayList<>();
-        expenseRepository.findAll().forEach(expenses::add);
-        return expenses;
-    }
 
     @Override
     public Expense findById(Long aLong) {
@@ -104,5 +97,10 @@ public class ExpenseServiceImpl implements ExpenseService {
                                 payMethod,
                                 category),
                 ExpenseQueries.sort(sortBy, sortType == null ? SortTypes.ASC : sortType));
+    }
+
+    @Override
+    public void deleteByIdAndUserId(Long userId, Long expenseId) {
+        expenseRepository.deleteByIdAndUserId(userId,expenseId);
     }
 }

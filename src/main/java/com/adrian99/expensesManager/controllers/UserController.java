@@ -21,16 +21,6 @@ public class UserController {
         this.expenseService = expenseService;
     }
 
-    @GetMapping("/users")
-    public List<User> findAll() {
-        return userService.findAll();
-    }
-
-    @GetMapping("/users/{id}")
-    public User findById(@PathVariable Long id) {
-        return userService.findById(id);
-    }
-
     @GetMapping("/users/expenses")
     public List<Expense> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
                                           @RequestParam(name = "amountLessThan", required = false) Double amountLessThan,
@@ -80,6 +70,12 @@ public class UserController {
         expense.setUsers(currentUser);
 
         return expenseService.save(expense);
+    }
+
+    @DeleteMapping("/users/expenses/{expenseId}")
+    public void deleteUserExpense(@PathVariable Long expenseId, Principal principal) {
+        Long userId = userService.findByUsername(principal.getName()).getId();
+        expenseService.deleteByIdAndUserId(userId, expenseId);
     }
 
     @PutMapping("users/{id}")

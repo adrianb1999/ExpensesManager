@@ -1,19 +1,29 @@
 package com.adrian99.expensesManager.repositories.custom.implementation;
 
-import com.adrian99.expensesManager.customQueries.UserQueries;
+import com.adrian99.expensesManager.model.QUser;
 import com.adrian99.expensesManager.model.User;
 import com.adrian99.expensesManager.repositories.custom.UserCustomRepository;
+import com.querydsl.jpa.impl.JPAQuery;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+
+@Repository
 public class UserCustomRepositoryImpl implements UserCustomRepository {
 
-    UserQueries userQueries;
+    private final EntityManager entityManager;
 
-    public UserCustomRepositoryImpl(UserQueries userQueries) {
-        this.userQueries = userQueries;
+    public UserCustomRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
+    @Transactional
     @Override
     public User findByUsername(String username) {
-        return userQueries.findByUsername(username);
+        JPAQuery<User> query = new JPAQuery<>(entityManager);
+        QUser qUser = QUser.user;
+        return query.select(qUser).from(qUser)
+                .where(qUser.username.eq(username)).fetchFirst();
     }
 }

@@ -20,4 +20,6 @@ public interface ExpenseCustomRepository {
                                    Category category,
                                    SortBy sortBy,
                                    SortTypes sortType);
+
+    void deleteByIdAndUserId(Long userId, Long expenseId);
 }

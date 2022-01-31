@@ -1,6 +1,5 @@
 package com.adrian99.expensesManager.services.implementation;
 
-import com.adrian99.expensesManager.customQueries.UserQueries;
 import com.adrian99.expensesManager.model.User;
 import com.adrian99.expensesManager.repositories.UserRepository;
 import com.adrian99.expensesManager.services.UserService;
@@ -8,8 +7,6 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,13 +16,6 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Override
-    public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
-        return users;
     }
 
     @Override

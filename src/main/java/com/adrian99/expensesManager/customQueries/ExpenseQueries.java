@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Component
 public class ExpenseQueries {
 
-    EntityManager em;
+    private final EntityManager em;
 
     public ExpenseQueries(EntityManager em) {
         this.em = em;
