@@ -7,17 +7,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.querydsl.QSort;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 
 @Component
 public class ExpenseQueries {
-
-    private final EntityManager em;
-
-    public ExpenseQueries(EntityManager em) {
-        this.em = em;
-    }
 
     public static QSort sort(SortBy sortBy, SortTypes sortType) {
         if (sortBy.equals(SortBy.DATE)) {

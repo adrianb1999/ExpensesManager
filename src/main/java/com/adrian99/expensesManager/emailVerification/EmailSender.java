@@ -22,7 +22,7 @@ public class EmailSender {
         helper.setFrom("");
         helper.setTo(email);
 
-        String link = "";
+        String link;
 
         if(tokenType.equals(TokenType.ACCOUNT_ACTIVATION)) {
             link = "Activation link: <a href=\"http://127.0.0.1:8080/registrationConfirm?token=" + token + "\" target=\"_blank\">Confirm</a>";

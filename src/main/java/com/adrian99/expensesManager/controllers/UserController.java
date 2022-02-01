@@ -3,7 +3,6 @@ package com.adrian99.expensesManager.controllers;
 import com.adrian99.expensesManager.customQueries.SortBy;
 import com.adrian99.expensesManager.customQueries.SortTypes;
 import com.adrian99.expensesManager.emailVerification.EmailSender;
-import com.adrian99.expensesManager.emailVerification.TokenType;
 import com.adrian99.expensesManager.emailVerification.VerificationToken;
 import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.model.*;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.adrian99.expensesManager.emailVerification.TokenType.*;
@@ -110,6 +108,7 @@ public class UserController {
 
         emailSender.sendEmail(currentUser.getEmail(), token, PASSWORD_RESET);
     }
+
     @PostMapping("/passwordReset")
     public void resetPassword(@RequestBody User user,
                               @RequestParam(name = "token") String token) {
