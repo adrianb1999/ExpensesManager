@@ -13,15 +13,17 @@ public class User {
     private String password;
     private Boolean active;
     private String roles;
+    private String email;
 
     public User() {
     }
 
-    public User(String username, String password, Boolean active, String roles) {
+    public User(String username, String password, Boolean active, String roles, String email) {
         this.username = username;
         this.password = password;
         this.active = active;
         this.roles = roles;
+        this.email = email;
     }
 
     public Long getId() {
@@ -64,4 +66,11 @@ public class User {
         this.roles = roles;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

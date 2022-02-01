@@ -1,6 +1,6 @@
 package com.adrian99.expensesManager.jwt;
 
-import com.adrian99.expensesManager.auth.ApplicationUser;
+import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
 import io.jsonwebtoken.Jwts;
@@ -44,8 +44,20 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
             return authenticate;
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (AuthenticationException e) {
+            try {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"message\":\"Bad credentials\"}");
+                response.getWriter().flush();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            throw new ApiRequestException("Wrong credentials!");
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -65,6 +77,5 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .compact();
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-
     }
 }
