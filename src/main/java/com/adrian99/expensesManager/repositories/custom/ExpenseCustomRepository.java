@@ -6,6 +6,7 @@ import com.adrian99.expensesManager.model.PayMethod;
 import com.adrian99.expensesManager.customQueries.SortBy;
 import com.adrian99.expensesManager.customQueries.SortTypes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ExpenseCustomRepository {
@@ -22,4 +23,5 @@ public interface ExpenseCustomRepository {
                                    SortTypes sortType);
 
     void deleteByIdAndUserId(Long userId, Long expenseId);
+    Double totalExpensesByDay(Long userId, LocalDate date);
 }

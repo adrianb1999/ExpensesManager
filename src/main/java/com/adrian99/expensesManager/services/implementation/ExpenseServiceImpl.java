@@ -9,9 +9,11 @@ import com.adrian99.expensesManager.customQueries.SortTypes;
 import com.adrian99.expensesManager.repositories.ExpenseRepository;
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.querydsl.core.types.Predicate;
+import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,5 +104,10 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void deleteByIdAndUserId(Long userId, Long expenseId) {
         expenseRepository.deleteByIdAndUserId(userId,expenseId);
+    }
+
+    @Override
+    public Double totalExpensesByDay(Long userId, LocalDate date) {
+        return expenseRepository.totalExpensesByDay(userId, date);
     }
 }

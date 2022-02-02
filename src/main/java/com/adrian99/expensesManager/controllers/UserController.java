@@ -9,11 +9,16 @@ import com.adrian99.expensesManager.model.*;
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.adrian99.expensesManager.services.UserService;
 import com.adrian99.expensesManager.services.VerificationTokenService;
+import org.apache.tomcat.jni.Local;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.adrian99.expensesManager.emailVerification.TokenType.*;
 
@@ -99,9 +104,9 @@ public class UserController {
 
         User currentUser = userService.findByUsername(user.getUsername());
 
-        if(currentUser == null)
+        if (currentUser == null)
             throw new ApiRequestException("The username doesn't exist!");
-        if(!currentUser.getActive())
+        if (!currentUser.getActive())
             throw new ApiRequestException("The account is not activated!");
 
         String token = userService.generateToken(currentUser);
@@ -112,7 +117,7 @@ public class UserController {
     @PostMapping("/passwordReset")
     public void resetPassword(@RequestBody User user,
                               @RequestParam(name = "token") String token) {
-        VerificationToken currentToken =  verificationTokenService.isTokenValid(token);
+        VerificationToken currentToken = verificationTokenService.isTokenValid(token);
 
         User currentUser = currentToken.getUser();
         currentUser.setPassword(user.getPassword());
@@ -153,4 +158,21 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
     }
+
+    @GetMapping("lastWeekTotalPerDays")
+    public List<Map<String, Object>> expensesByDay(Principal principal) {
+
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        Long userId = userService.findByUsername(principal.getName()).getId();
+
+        for (int i = 0; i < 7; i++) {
+            Map<String, Object> data = new HashMap<>();
+            LocalDate currentDate = LocalDate.now().minusDays(i);
+            data.put("Date", currentDate);
+            data.put("Total", expenseService.totalExpensesByDay(userId, currentDate));
+            dataList.add(data);
+        }
+        return dataList;
+    }
+
 }

@@ -8,10 +8,12 @@ import com.adrian99.expensesManager.model.PayMethod;
 import com.adrian99.expensesManager.model.QExpense;
 import com.adrian99.expensesManager.repositories.custom.ExpenseCustomRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -40,4 +42,18 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
                         expense.users.id.eq(userId)))
                 .execute();
     }
+
+    @Transactional
+    @Override
+    public Double totalExpensesByDay(Long userId, LocalDate date) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QExpense expense = QExpense.expense;
+
+        return queryFactory
+                .select(expense.amount.sum())
+                .from(expense)
+                .where(expense.date.eq(date).and(expense.users.id.eq(userId)))
+                .fetchFirst();
+    }
+
 }
