@@ -7,14 +7,19 @@ import com.adrian99.expensesManager.model.Expense;
 import com.adrian99.expensesManager.model.PayMethod;
 import com.adrian99.expensesManager.model.QExpense;
 import com.adrian99.expensesManager.repositories.custom.ExpenseCustomRepository;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
@@ -39,21 +44,26 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
         queryFactory.delete(expense)
                 .where(
                         expense.id.eq(expenseId).and(
-                        expense.users.id.eq(userId)))
+                                expense.users.id.eq(userId)))
                 .execute();
     }
 
     @Transactional
     @Override
-    public Double totalExpensesByDay(Long userId, LocalDate date) {
+    public List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QExpense expense = QExpense.expense;
 
         return queryFactory
-                .select(expense.amount.sum())
+                .select(expense.date, expense.amount.sum())
                 .from(expense)
-                .where(expense.date.eq(date).and(expense.users.id.eq(userId)))
-                .fetchFirst();
+                .where(expense.date.between(firstDate, secondDate).and(expense.users.id.eq(userId)))
+                .groupBy(expense.date)
+                .fetch().stream().map(tuple ->
+                        new HashMap<String, Object>() {{
+                            put("Date", tuple.get(0, LocalDate.class));
+                            put("Total", tuple.get(1, Double.class));
+                        }})
+                .collect(Collectors.toList());
     }
-
 }

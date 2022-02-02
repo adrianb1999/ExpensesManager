@@ -6,10 +6,10 @@ import com.adrian99.expensesManager.emailVerification.EmailSender;
 import com.adrian99.expensesManager.emailVerification.VerificationToken;
 import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.model.*;
+import com.adrian99.expensesManager.repositories.custom.implementation.ExpenseCustomRepositoryImpl;
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.adrian99.expensesManager.services.UserService;
 import com.adrian99.expensesManager.services.VerificationTokenService;
-import org.apache.tomcat.jni.Local;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -29,12 +29,14 @@ public class UserController {
     private final ExpenseService expenseService;
     private final VerificationTokenService verificationTokenService;
     private final EmailSender emailSender;
+    private final ExpenseCustomRepositoryImpl expenseCustomRepository;//delete later
 
-    public UserController(UserService userService, ExpenseService expenseService, VerificationTokenService verificationTokenService, EmailSender emailSender) {
+    public UserController(UserService userService, ExpenseService expenseService, VerificationTokenService verificationTokenService, EmailSender emailSender, ExpenseCustomRepositoryImpl expenseCustomRepository) {
         this.userService = userService;
         this.expenseService = expenseService;
         this.verificationTokenService = verificationTokenService;
         this.emailSender = emailSender;
+        this.expenseCustomRepository = expenseCustomRepository;
     }
 
     @GetMapping("/users/expenses")
@@ -162,17 +164,9 @@ public class UserController {
     @GetMapping("lastWeekTotalPerDays")
     public List<Map<String, Object>> expensesByDay(Principal principal) {
 
-        List<Map<String, Object>> dataList = new ArrayList<>();
         Long userId = userService.findByUsername(principal.getName()).getId();
 
-        for (int i = 0; i < 7; i++) {
-            Map<String, Object> data = new HashMap<>();
-            LocalDate currentDate = LocalDate.now().minusDays(i);
-            data.put("Date", currentDate);
-            data.put("Total", expenseService.totalExpensesByDay(userId, currentDate));
-            dataList.add(data);
-        }
-        return dataList;
+        return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(7),LocalDate.now());
     }
 
 }

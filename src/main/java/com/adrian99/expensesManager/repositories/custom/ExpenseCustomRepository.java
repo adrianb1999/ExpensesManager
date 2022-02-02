@@ -8,6 +8,7 @@ import com.adrian99.expensesManager.customQueries.SortTypes;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface ExpenseCustomRepository {
     List<Expense> findAllByFilters(Long userId,
@@ -23,5 +24,5 @@ public interface ExpenseCustomRepository {
                                    SortTypes sortType);
 
     void deleteByIdAndUserId(Long userId, Long expenseId);
-    Double totalExpensesByDay(Long userId, LocalDate date);
+    List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate);
 }

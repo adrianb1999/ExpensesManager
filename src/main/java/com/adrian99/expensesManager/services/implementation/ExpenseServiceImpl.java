@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -103,11 +104,11 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void deleteByIdAndUserId(Long userId, Long expenseId) {
-        expenseRepository.deleteByIdAndUserId(userId,expenseId);
+        expenseRepository.deleteByIdAndUserId(userId, expenseId);
     }
 
     @Override
-    public Double totalExpensesByDay(Long userId, LocalDate date) {
-        return expenseRepository.totalExpensesByDay(userId, date);
+    public List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate) {
+        return expenseRepository.totalExpensesByDay(userId, firstDate, secondDate);
     }
 }
