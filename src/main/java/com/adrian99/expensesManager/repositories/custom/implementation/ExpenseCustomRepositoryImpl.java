@@ -61,8 +61,8 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
                 .groupBy(expense.date)
                 .fetch().stream().map(tuple ->
                         new HashMap<String, Object>() {{
-                            put("Date", tuple.get(0, LocalDate.class));
-                            put("Total", tuple.get(1, Double.class));
+                            put("date", tuple.get(0, LocalDate.class));
+                            put("total", tuple.get(1, Double.class));
                         }})
                 .collect(Collectors.toList());
     }

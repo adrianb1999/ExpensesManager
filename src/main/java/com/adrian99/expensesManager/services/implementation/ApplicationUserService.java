@@ -24,7 +24,6 @@ public class ApplicationUserService implements UserDetailsService {
         User user = userService.findByUsername(username);
 
         if (user == null) {
-            System.out.println("Username gresit\n\n\n\n\n\n");
             throw new ApiRequestException("Username not found!");
         }
         return new ApplicationUser(user);
