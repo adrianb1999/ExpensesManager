@@ -83,7 +83,10 @@ function createUser() {
             if (response.status == 200)
                 window.location.href = "login.html";
             else {
-                let errorLaber = document.getElementById("loginError");
+                response.json().then(data => {
+                    document.getElementById("createUserMessage").textContent = data.message ;
+                })
+
             }
         })
         .catch((error) => {

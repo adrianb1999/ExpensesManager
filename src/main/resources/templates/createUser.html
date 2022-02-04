@@ -6,16 +6,20 @@
         <title>Test Client</title>
     </head>
     <body>
+        <div>
+            <label >Name:</label><br>
+            <input type="text" id="createUsername"><br>
 
-        <label >Name:</label><br>
-        <input type="text" id="createUsername"><br>
+            <label >Email:</label><br>
+            <input type="email" id="createEmail"><br>
 
-        <label >Email:</label><br>
-        <input type="email" id="createEmail"><br>
-
-        <label >Password:</label><br>
-        <input type="password" id="createPassword">
-        <br>
-        <button type="button" onclick="createUser()">Create account</button>
+            <label >Password:</label><br>
+            <input type="password" id="createPassword">
+            <br>
+            <button type="button" onclick="createUser()">Create account</button>
+        </div>
+        <div>
+            <h1 id="createUserMessage"></h1>
+        </div>
     </body>
 </html>
