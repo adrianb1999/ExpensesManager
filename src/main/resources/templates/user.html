@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <script th:src="@{/js/main.js}"></script>
+        <link th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
+    </head>
+    <body onLoad="onLoadCustom()">
+        <div>
+            <label>Category:</label><br>
+            <select id="categories" name="categories">
+                <option value="FUEL">Fuel</option>
+                <option value="FOOD">Food</option>
+                <option value="DRINKS">Drinks</option>
+                <option value="SCHOOL">School</option>
+                <option value="BEAUTY">Beauty</option>
+                <option value="CULTURE">Culture</option>
+                <option value="HEALTH">Health</option>
+                <option value="GIFT">Gift</option>
+                <option value="CLOTHES">Clothes</option>
+                <option value="TRANSPORT">Transport</option>
+                <option value="EDUCATION">Education</option>
+                <option value="OTHER">Other</option>
+            </select><br>
+            <label>Pay method:</label><br>
+            <select id="payMethods" name="payMethods">
+                <option value="CARD">Card</option>
+                <option value="CASH">Cash</option>
+            </select><br>
+            
+            <label for="amount">Amount:</label><br>
+            <input type="number" id="amount"><br>
+
+            <label for="details">Details:</label><br>
+            <input type="Text" id="details"><br>
+            
+            <label for="date">Date:</label><br>
+            <input type="date" id="date"><br>
+       
+            <button onclick="postExpense()">Add expense</button>
+        </div>
+        <br><br><br>
+    <div>
+        <table id="tableId"></table>
+    </div>
+        <div>
+            <table id="lastSevenDays"></table>
+        </div>
+    </body>
+</html>
