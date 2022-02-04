@@ -4,4 +4,5 @@ import com.adrian99.expensesManager.model.User;
 
 public interface UserCustomRepository {
     User findByUsername(String username);
+    User findByEmail(String email);
 }

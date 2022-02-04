@@ -78,4 +78,9 @@ public class UserServiceImpl implements UserService {
     public <S extends User> Iterable<S> saveAll(Iterable<S> entities) {
         return userRepository.saveAll(entities);
     }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }
