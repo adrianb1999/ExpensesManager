@@ -1,5 +1,6 @@
 package com.adrian99.expensesManager.services.implementation;
 
+import com.adrian99.expensesManager.emailVerification.TokenState;
 import com.adrian99.expensesManager.emailVerification.VerificationToken;
 import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.repositories.VerificationTokenRepository;
@@ -40,11 +41,31 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     @Override
     public VerificationToken isTokenValid(String token) {
         VerificationToken currentToken = findByToken(token);
+
         if(currentToken == null)
             throw new ApiRequestException("The token is invalid!");
         if(currentToken.getExpiryDate().isBefore(LocalDateTime.now()))
             throw new ApiRequestException("Token has expired!");
 
         return currentToken;
+    }
+
+    @Override
+    public TokenState isTokenValidHtml(String token) {
+        VerificationToken currentToken = findByToken(token);
+        if(currentToken == null)
+            return TokenState.INVALID;
+        if(currentToken.getExpiryDate().isBefore(LocalDateTime.now()))
+           return TokenState.EXPIRED;
+
+        currentToken.getUser().setActive(true);
+        deleteById(currentToken.getId());
+
+        return TokenState.VALID;
+    }
+
+    @Override
+    public <S extends VerificationToken> Iterable<S> saveAll(Iterable<S> entities) {
+        return verificationTokenRepository.saveAll(entities);
     }
 }
