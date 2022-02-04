@@ -68,10 +68,23 @@ public class UserController {
     @PostMapping("/api/createUser")
     public User createUser(@RequestBody User user) throws MessagingException {
 
+        if(user.getUsername() == null || user.getUsername().isEmpty())
+            throw new ApiRequestException("Username is null!");
+
+        if (user.getEmail() == null || user.getEmail().isEmpty())
+            throw new ApiRequestException("Email is null!");
+
+        if(!user.getEmail().contains("@"))
+            throw new ApiRequestException("Invalid email!");
+
+        if(user.getPassword() == null || user.getPassword().isEmpty())
+            throw new ApiRequestException("Password is null!");
+
+        if(userService.findByEmail(user.getEmail()) != null)
+            throw new ApiRequestException("Email already used!");
+
         if (userService.findByUsername(user.getUsername()) != null)
             throw new ApiRequestException("Username already exists!");
-        if (user.getEmail() == null)
-            throw new ApiRequestException("Email is null!");
 
         User newUser = new User();
         newUser.setUsername(user.getUsername());
