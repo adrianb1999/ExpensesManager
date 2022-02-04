@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +37,7 @@ public class UserController {
         this.expenseCustomRepository = expenseCustomRepository;
     }
 
-    @GetMapping("/users/expenses")
+    @GetMapping("/api/users/expenses")
     public List<Expense> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
                                           @RequestParam(name = "amountLessThan", required = false) Double amountLessThan,
                                           @RequestParam(name = "amountGreaterThan", required = false) Double amountGreaterThan,
@@ -67,7 +65,7 @@ public class UserController {
         );
     }
 
-    @PostMapping("/createUser")
+    @PostMapping("/api/createUser")
     public User createUser(@RequestBody User user) throws MessagingException {
 
         if (userService.findByUsername(user.getUsername()) != null)
@@ -91,9 +89,8 @@ public class UserController {
         return newUser;
     }
 
-    @GetMapping("/registrationConfirm")
+    @GetMapping("/api/registrationConfirm")
     public void confirmUser(@RequestParam(name = "token") String token) {
-
         VerificationToken currentToken = verificationTokenService.isTokenValid(token);
 
         currentToken.getUser().setActive(true);
@@ -101,7 +98,7 @@ public class UserController {
         verificationTokenService.deleteById(currentToken.getId());
     }
 
-    @GetMapping("/passwordReset")
+    @PostMapping("/api/passwordResetSendLink")
     public void sendResetToken(@RequestBody User user) throws MessagingException {
 
         User currentUser = userService.findByUsername(user.getUsername());
@@ -116,7 +113,7 @@ public class UserController {
         emailSender.sendEmail(currentUser.getEmail(), token, PASSWORD_RESET);
     }
 
-    @PostMapping("/passwordReset")
+    @PostMapping("/api/passwordReset")
     public void resetPassword(@RequestBody User user,
                               @RequestParam(name = "token") String token) {
         VerificationToken currentToken = verificationTokenService.isTokenValid(token);
@@ -129,7 +126,17 @@ public class UserController {
         verificationTokenService.deleteById(currentToken.getId());
     }
 
-    @PostMapping("/users/expenses")
+    @PostMapping("/api/users/multipleExpenses")
+    public Iterable<Expense> addUserAllExpenses(@RequestBody List<Expense> expense, Principal principal) {
+
+        User currentUser = userService.findByUsername(principal.getName());
+
+        expense.forEach(expense1 -> expense1.setUsers(currentUser));;
+
+        return expenseService.saveAll(expense);
+    }
+
+    @PostMapping("/api/users/expenses")
     public Expense addUserExpense(@RequestBody Expense expense, Principal principal) {
 
         User currentUser = userService.findByUsername(principal.getName());
@@ -138,13 +145,13 @@ public class UserController {
         return expenseService.save(expense);
     }
 
-    @DeleteMapping("/users/expenses/{expenseId}")
+    @DeleteMapping("/api/users/expenses/{expenseId}")
     public void deleteUserExpense(@PathVariable Long expenseId, Principal principal) {
         Long userId = userService.findByUsername(principal.getName()).getId();
         expenseService.deleteByIdAndUserId(userId, expenseId);
     }
 
-    @PutMapping("users/{id}")
+    @PutMapping("/api/users/{id}")
     public User saveOrUpdate(@RequestBody User newUser, @PathVariable Long id) {
         User updateUser = userService.findById(id);
 
@@ -156,17 +163,17 @@ public class UserController {
         return userService.save(newUser);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/api/users/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
     }
 
-    @GetMapping("lastWeekTotalPerDays")
+    @GetMapping("/api/lastWeekTotalPerDays")
     public List<Map<String, Object>> expensesByDay(Principal principal) {
 
         Long userId = userService.findByUsername(principal.getName()).getId();
 
-        return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(7),LocalDate.now());
+        return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(7), LocalDate.now());
     }
 
 }
