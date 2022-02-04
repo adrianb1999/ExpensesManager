@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
+                                                HttpServletResponse response) throws AuthenticationException, ApiRequestException {
         try {
             UsernameAndPasswordAuthenticationRequest authenticationRequest = new ObjectMapper()
                     .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequest.class);
@@ -46,21 +47,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
             return authenticate;
 
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationException | IOException e) {
             try {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write("{\"message\":\"Bad credentials\"}");
+                response.getWriter().write("{\"message\":\""+e.getMessage() +"\"}");
                 response.getWriter().flush();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
-            throw new ApiRequestException("Wrong credentials!");
         }
-        catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        return null;
     }
 
     @Override
@@ -78,5 +75,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .compact();
 
         response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
+        response.addCookie(new Cookie(jwtConfig.getAuthorizationHeader(), token));
     }
 }

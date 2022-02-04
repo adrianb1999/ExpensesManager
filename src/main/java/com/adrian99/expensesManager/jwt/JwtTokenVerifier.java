@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,12 +38,12 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
         String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeader());
 
-        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) {
+        if ((Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) && request.getCookies() == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
+        String token = request.getCookies() != null ? request.getCookies()[0].getValue() : authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
 
         try {
             Jws<Claims> claimsJws = Jwts.parserBuilder()
