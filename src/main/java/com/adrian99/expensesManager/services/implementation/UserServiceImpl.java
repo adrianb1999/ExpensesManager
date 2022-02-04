@@ -73,4 +73,9 @@ public class UserServiceImpl implements UserService {
         verificationTokenRepository.save(verificationToken);
         return token;
     }
+
+    @Override
+    public <S extends User> Iterable<S> saveAll(Iterable<S> entities) {
+        return userRepository.saveAll(entities);
+    }
 }

@@ -8,5 +8,7 @@ public interface CrudService<T, ID>{
 
     T save(T object);
 
+    <S extends T> Iterable<S> saveAll(Iterable<S> entities);
+
     void deleteById(ID id);
 }

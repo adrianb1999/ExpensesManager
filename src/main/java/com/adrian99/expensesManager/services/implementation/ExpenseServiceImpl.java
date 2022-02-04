@@ -111,4 +111,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     public List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate) {
         return expenseRepository.totalExpensesByDay(userId, firstDate, secondDate);
     }
+
+    @Override
+    public <S extends Expense> Iterable<S> saveAll(Iterable<S> entities) {
+        return expenseRepository.saveAll(entities);
+    }
 }
