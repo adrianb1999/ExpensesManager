@@ -4,9 +4,11 @@
         <link th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
     </head>
     <body onLoad="onLoadCustom()">
-        <div>
+        <div class="card">
+            <label>Title</label>
+            <input type="Text" id="title"><br>
             <label>Category:</label><br>
-            <select id="categories" name="categories">
+            <select id="categories" name="categories" class="formSelect">
                 <option value="FUEL">Fuel</option>
                 <option value="FOOD">Food</option>
                 <option value="DRINKS">Drinks</option>
@@ -21,7 +23,7 @@
                 <option value="OTHER">Other</option>
             </select><br>
             <label>Pay method:</label><br>
-            <select id="payMethods" name="payMethods">
+            <select id="payMethods" name="payMethods" class="formSelect">
                 <option value="CARD">Card</option>
                 <option value="CASH">Cash</option>
             </select><br>
@@ -34,15 +36,15 @@
             
             <label for="date">Date:</label><br>
             <input type="date" id="date"><br>
-       
-            <button onclick="postExpense()">Add expense</button>
+            <br>
+            <button onclick="postExpense()" class="button">Add expense</button>
         </div>
-        <br><br><br>
+    <div class="tableDiv">
+        <table id="tableId">
+        </table>
+    </div><!--
     <div>
-        <table id="tableId"></table>
-    </div>
-        <div>
-            <table id="lastSevenDays"></table>
-        </div>
+       <table id="lastSevenDays"></table>
+    </div>-->
     </body>
 </html>

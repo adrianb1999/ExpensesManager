@@ -6,20 +6,20 @@
         <title>Test Client</title>
     </head>
     <body>
-        <div id="totalDiv">
-            <div id="divForm">
-                <h1>Login</h1>
+        <div class="card">
+            <div class="formId">
                 <label>Name:</label><br>
                 <input type="text" id="username" required><br>
                 <label>Password:</label><br>
                 <input type="password" id="password" required>
-                <button  onclick="login()">Login</button>
+                <h5 id="loginError"></h5>
+                <button  onclick="login()" class="button">Login</button><br><br>
+                <a href="createUser.html">Create account</a>
+                <a href="passwordReset.html">Forgot password?</a>
             </div>
-            <h1 th:text="${TokenState}"></h1>
-            <a href="passwordReset.html">Forgot password?</a>
         </div>
         <div>
-            <h1 id="loginError"></h1>
+            <h1 th:text="${TokenState}"></h1><br>
         </div>
     </body>
 </html>

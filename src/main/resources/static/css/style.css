@@ -1,35 +1,147 @@
 *{
     box-sizing: border-box;
 }
+
 body,html{
     margin: 0;
     padding: 0;
+    font-family: roboto;
 }
+
 body{
     height: 100vh;
-    background: linear-gradient(45deg, #5b35f1,#4d02d4);
+    background: linear-gradient(45deg, #49a09d, #5f2c82);
     display: flex;
 }
+
 .card{
     width: 400px;
-    height: 200px;
+    min-height: 250px;
     padding: 30px;
-    background: white;
+    background: #FAF5EF;
     border-radius: 15px;
     margin: auto;
-    box-shadow: 0 0 5px 0 #7775;
+    box-shadow: 2px 2px #34495e;
 }
-a:link, a:visited {
-    background-color: #5b35f1;
+
+.tableDiv{
+    margin: auto;
+    overflow-y: auto;
+    height: 80vh;
+}
+
+.tableDiv thead th{
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.tableDiv tfoot{
+    position: sticky;
+    bottom: 0;
+    background-color: #34ace0;
+}
+
+.formSelect{
+    font-family: roboto;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 22px;
+}
+.button, .formSelect{
+    font-family: roboto;
+    font-size: 15px;
+    width: 95%;
+    background-color: #34ace0;
     color: white;
-    border: 2px solid #4d02d4;
+    border: 2px solid #34495e;
+    border-radius: 7px;
     padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
+    transition: 0.5s;
+    font-weight: bold;
+}
+h3{
+    margin: auto;
+}
+a:link, a:visited{
+    background: none;
+    margin: 5px 5px 5px 5px;
+    font-weight: bold;
 }
 
-a:hover, a:active {
+button:hover{
     background-color: white;
     color: #5b35f1;
+}
+
+#tableId {
+    border-radius:10px;
+    background-color: #FAF5EF;
+    border-collapse: collapse;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+#tableId td{
+    padding: 8px;
+}
+
+#tableId tr:hover {
+    background-color: #706fd3;
+    color:white;
+}
+
+#tableId th{
+    padding: 12px 8px;
+    text-align: center;
+    background-color: #34ace0;
+    color: white;
+    border: none;
+}
+
+label{
+    font-size: 22px;
+    color: #2f3542;
+    font-weight: bold;
+}
+.pageButton{
+    width: 100%;
+}
+input{
+    width: 100%;
+    padding: 5px 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    background: none;
+    border: none;
+    border-bottom: 2px solid #34495e;
+    font-size: 19px;
+    font-weight: bold;
+    font-family: roboto;
+    color: #2f3542;
+}
+#currentPage{
+    text-align: center;
+    font-family: roboto;
+    font-weight: bold;
+    color: white;
+    font-size: 15px;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: none;
 }
