@@ -1,6 +1,7 @@
 package com.adrian99.expensesManager.services.implementation;
 
 import com.adrian99.expensesManager.emailVerification.TokenState;
+import com.adrian99.expensesManager.emailVerification.TokenType;
 import com.adrian99.expensesManager.emailVerification.VerificationToken;
 import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.repositories.VerificationTokenRepository;
@@ -51,12 +52,15 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     @Override
-    public TokenState isTokenValidHtml(String token) {
+    public TokenState isTokenValidHtml(String token, TokenType tokenType) {
         VerificationToken currentToken = findByToken(token);
         if(currentToken == null)
             return TokenState.INVALID;
         if(currentToken.getExpiryDate().isBefore(LocalDateTime.now()))
            return TokenState.EXPIRED;
+
+        if(tokenType.equals(TokenType.PASSWORD_RESET))
+            return TokenState.VALID;
 
         currentToken.getUser().setActive(true);
         deleteById(currentToken.getId());

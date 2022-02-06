@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Iterable<User> findAll(Predicate predicate, Sort sort) {
-        return findAll(predicate, sort);
+        return userRepository.findAll(predicate, sort);
     }
 
     @Override

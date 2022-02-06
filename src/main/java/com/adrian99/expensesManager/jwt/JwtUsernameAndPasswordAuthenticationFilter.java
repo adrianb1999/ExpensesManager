@@ -51,7 +51,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
             try {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"message\":\"Username of password is incorrect!\"}");
+                response.getWriter().write("{\"message\":\"Username or password is incorrect!\"}");
                 response.getWriter().flush();
             } catch (IOException ex) {
                 ex.printStackTrace();

@@ -7,15 +7,12 @@ import com.adrian99.expensesManager.model.Expense;
 import com.adrian99.expensesManager.model.PayMethod;
 import com.adrian99.expensesManager.model.QExpense;
 import com.adrian99.expensesManager.repositories.custom.ExpenseCustomRepository;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

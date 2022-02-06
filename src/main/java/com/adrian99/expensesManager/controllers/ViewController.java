@@ -1,6 +1,7 @@
 package com.adrian99.expensesManager.controllers;
 
 import com.adrian99.expensesManager.emailVerification.TokenState;
+import com.adrian99.expensesManager.emailVerification.TokenType;
 import com.adrian99.expensesManager.services.VerificationTokenService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,7 +40,7 @@ public class ViewController {
     @RequestMapping("/registrationConfirm.html")
     public String confirmAccount(@RequestParam(name = "token") String token, Model model) {
 
-        TokenState tokenState = verificationTokenService.isTokenValidHtml(token);
+        TokenState tokenState = verificationTokenService.isTokenValidHtml(token, TokenType.ACCOUNT_ACTIVATION);
 
         if (!tokenState.equals(TokenState.VALID)) {
             model.addAttribute("TokenState", tokenState);
@@ -51,6 +52,14 @@ public class ViewController {
 
     @RequestMapping("/passwordResetForm.html")
     public String passwordResetForm(@RequestParam(name = "token") String token, Model model) {
+
+        TokenState tokenState = verificationTokenService.isTokenValidHtml(token,TokenType.PASSWORD_RESET);
+
+        if (!tokenState.equals(TokenState.VALID)) {
+            model.addAttribute("TokenState", tokenState);
+            return "registrationConfirm";
+        }
+
         model.addAttribute("Token", token);
         return "passwordResetForm";
     }

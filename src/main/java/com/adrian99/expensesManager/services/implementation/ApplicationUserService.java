@@ -1,7 +1,6 @@
 package com.adrian99.expensesManager.services.implementation;
 
 import com.adrian99.expensesManager.auth.ApplicationUser;
-import com.adrian99.expensesManager.exception.ApiExceptionHandler;
 import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.model.User;
 import com.adrian99.expensesManager.services.UserService;
