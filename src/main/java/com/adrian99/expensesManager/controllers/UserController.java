@@ -10,9 +10,11 @@ import com.adrian99.expensesManager.repositories.custom.implementation.ExpenseCu
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.adrian99.expensesManager.services.UserService;
 import com.adrian99.expensesManager.services.VerificationTokenService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.Map;
 import static com.adrian99.expensesManager.emailVerification.TokenType.*;
 
 @RestController
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -66,19 +69,7 @@ public class UserController {
     }
 
     @PostMapping("/api/createUser")
-    public User createUser(@RequestBody User user) throws MessagingException {
-
-        if(user.getUsername() == null || user.getUsername().isEmpty())
-            throw new ApiRequestException("Username is null!");
-
-        if (user.getEmail() == null || user.getEmail().isEmpty())
-            throw new ApiRequestException("Email is null!");
-
-        if(!user.getEmail().contains("@"))
-            throw new ApiRequestException("Invalid email!");
-
-        if(user.getPassword() == null || user.getPassword().isEmpty())
-            throw new ApiRequestException("Password is null!");
+    public User createUser(@RequestBody @Valid User user) throws MessagingException {
 
         if(userService.findByEmail(user.getEmail()) != null)
             throw new ApiRequestException("Email already used!");
@@ -140,17 +131,17 @@ public class UserController {
     }
 
     @PostMapping("/api/users/multipleExpenses")
-    public Iterable<Expense> addUserAllExpenses(@RequestBody List<Expense> expense, Principal principal) {
+    public Iterable<Expense> addUserAllExpenses(@RequestBody @Valid List<Expense> expense, Principal principal) {
 
         User currentUser = userService.findByUsername(principal.getName());
 
-        expense.forEach(expense1 -> expense1.setUsers(currentUser));;
+        expense.forEach(expense1 -> expense1.setUsers(currentUser));
 
         return expenseService.saveAll(expense);
     }
 
     @PostMapping("/api/users/expenses")
-    public Expense addUserExpense(@RequestBody Expense expense, Principal principal) {
+    public Expense addUserExpense(@RequestBody @Valid Expense expense, Principal principal) {
 
         User currentUser = userService.findByUsername(principal.getName());
         expense.setUsers(currentUser);
@@ -188,5 +179,4 @@ public class UserController {
 
         return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(7), LocalDate.now());
     }
-
 }

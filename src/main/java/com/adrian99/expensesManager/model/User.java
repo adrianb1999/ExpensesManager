@@ -1,6 +1,9 @@
 package com.adrian99.expensesManager.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users")
@@ -9,10 +12,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Username cannot be empty")
+    @NotEmpty(message = "Username cannot be empty")
     private String username;
+
+    @NotNull(message = "Password cannot be empty")
+    @NotEmpty(message = "Password cannot be empty")
     private String password;
+
     private Boolean active;
     private String roles;
+
+    @NotNull(message = "Email cannot be empty")
+    @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "Email is not valid")
     private String email;
 
     public User() {
