@@ -6,6 +6,8 @@ import com.adrian99.expensesManager.repositories.UserRepository;
 import com.adrian99.expensesManager.repositories.VerificationTokenRepository;
 import com.adrian99.expensesManager.services.UserService;
 import com.querydsl.core.types.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -82,5 +84,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Page<User> findAll(Predicate predicate, Pageable pageable) {
+        return userRepository.findAll(predicate, pageable);
     }
 }

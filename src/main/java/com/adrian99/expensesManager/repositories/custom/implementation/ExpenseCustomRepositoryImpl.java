@@ -28,7 +28,7 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
     }
 
     @Override  //TODO Find a better way
-    public List<Expense> findAllByFilters(Long userId, Double amount, Double amountLessThan, Double amountGreaterThan, String date, String dateAfter, String dateBefore, PayMethod payMethod, Category category, SortBy sortBy, SortTypes sortType) {
+    public List<Expense> findAllByFilters(Long userId, Double amount, Double amountLessThan, Double amountGreaterThan, String date, String dateAfter, String dateBefore, PayMethod payMethod, Category category, SortBy sortBy, SortTypes sortType, Integer pageSize,Integer pageNum) {
         return null;
     }
 

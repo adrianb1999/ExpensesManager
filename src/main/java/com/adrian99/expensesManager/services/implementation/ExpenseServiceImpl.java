@@ -10,6 +10,9 @@ import com.adrian99.expensesManager.repositories.ExpenseRepository;
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.querydsl.core.types.Predicate;
 import org.apache.tomcat.jni.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -74,8 +77,10 @@ public class ExpenseServiceImpl implements ExpenseService {
                                           PayMethod payMethod,
                                           Category category,
                                           SortBy sortBy,
-                                          SortTypes sortType) {
-        if (sortBy == null)
+                                          SortTypes sortType,
+                                          Integer pageSize,
+                                          Integer pageNum) {
+        if (sortBy == null && pageNum == null && pageSize == null)
             return (List<Expense>)
                     findAll(expenseQueries
                             .customPredicate(
@@ -88,7 +93,32 @@ public class ExpenseServiceImpl implements ExpenseService {
                                     dateBefore,
                                     payMethod,
                                     category));
-        return (List<Expense>) findAll(expenseQueries
+        else if(pageNum == null && pageSize == null)
+            return (List<Expense>) findAll(expenseQueries
+                            .customPredicate(
+                                    userId,
+                                    amount,
+                                    amountLessThan,
+                                    amountGreaterThan,
+                                    date,
+                                    dateAfter,
+                                    dateBefore,
+                                    payMethod,
+                                    category),
+                    ExpenseQueries.sort(sortBy, sortType == null ? SortTypes.ASC : sortType));
+        else if(sortBy == null)
+            return findAll(expenseQueries
+                    .customPredicate(
+                            userId,
+                            amount,
+                            amountLessThan,
+                            amountGreaterThan,
+                            date,
+                            dateAfter,
+                            dateBefore,
+                            payMethod,
+                            category), PageRequest.of(pageNum,pageSize)).getContent();
+        else return findAll(expenseQueries
                         .customPredicate(
                                 userId,
                                 amount,
@@ -98,8 +128,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                                 dateAfter,
                                 dateBefore,
                                 payMethod,
-                                category),
-                ExpenseQueries.sort(sortBy, sortType == null ? SortTypes.ASC : sortType));
+                                category),PageRequest.of(pageNum,pageSize,ExpenseQueries.sort(sortBy, sortType == null ? SortTypes.ASC : sortType))).getContent();
     }
 
     @Override
@@ -115,5 +144,10 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public <S extends Expense> Iterable<S> saveAll(Iterable<S> entities) {
         return expenseRepository.saveAll(entities);
+    }
+
+    @Override
+    public Page<Expense> findAll(Predicate predicate, Pageable pageable) {
+        return expenseRepository.findAll(predicate, pageable);
     }
 }

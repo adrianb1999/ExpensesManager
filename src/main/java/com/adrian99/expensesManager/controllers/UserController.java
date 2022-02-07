@@ -51,6 +51,8 @@ public class UserController {
                                           @RequestParam(name = "category", required = false) Category category,
                                           @RequestParam(name = "sortBy", required = false) SortBy sortBy,
                                           @RequestParam(name = "sortType", required = false) SortTypes sortType,
+                                          @RequestParam(name = "pageSize", required = false) Integer pageSize,
+                                          @RequestParam(name = "pageNum", required = false) Integer pageNum,
                                           Principal principal) {
         Long id = userService.findByUsername(principal.getName()).getId();
         return expenseService.findAllByFilters(
@@ -64,7 +66,9 @@ public class UserController {
                 payMethod,
                 category,
                 sortBy,
-                sortType
+                sortType,
+                pageSize,
+                pageNum
         );
     }
 

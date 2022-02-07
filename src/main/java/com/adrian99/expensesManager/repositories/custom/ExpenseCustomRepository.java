@@ -21,8 +21,9 @@ public interface ExpenseCustomRepository {
                                    PayMethod payMethod,
                                    Category category,
                                    SortBy sortBy,
-                                   SortTypes sortType);
-
+                                   SortTypes sortType,
+                                   Integer pageSize,
+                                   Integer pageNum);
     void deleteByIdAndUserId(Long userId, Long expenseId);
     List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate);
 }
