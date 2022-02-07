@@ -23,6 +23,9 @@ body{
     margin: auto;
     box-shadow: 2px 2px #34495e;
 }
+.card h2{
+    text-align: center;
+}
 
 .tableDiv{
     margin: auto;
@@ -48,33 +51,38 @@ body{
     margin-bottom: 5px;
     font-size: 22px;
 }
-.button, .formSelect{
+
+.button, .formSelect {
     font-family: roboto;
     font-size: 15px;
-    width: 95%;
-    background-color: #34ace0;
+    width: 100%;
+    background-color: #4c969b;
     color: white;
-    border: 2px solid #34495e;
     border-radius: 7px;
+    border: 0;
     padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     transition: 0.5s;
     font-weight: bold;
+    box-shadow: 0 0 5px 0 #4d959b;
+    cursor: pointer;
 }
+
+button:hover {
+    background-color: #5e2c82;
+    box-shadow: 0 0 5px 0 #5e2c82;
+}
+
 h3{
     margin: auto;
 }
-a:link, a:visited{
+a:link, a:visited {
     background: none;
     margin: 5px 5px 5px 5px;
-    font-weight: bold;
-}
-
-button:hover{
-    background-color: white;
-    color: #5b35f1;
+    color: #333;
+    font-size: 14px;
 }
 
 #tableId {
@@ -109,20 +117,28 @@ label{
 .pageButton{
     width: 100%;
 }
-input{
+input {
     width: 100%;
-    padding: 5px 15px;
+    padding: 8px 5px;
+    padding-bottom: 9px;
     margin-top: 5px;
     margin-bottom: 5px;
     box-sizing: border-box;
     background: none;
     border: none;
-    border-bottom: 2px solid #34495e;
-    font-size: 19px;
-    font-weight: bold;
+    border-bottom: 1px solid #4d959b;
+    font-size: 16px;
+    /* font-weight: bold; */
     font-family: roboto;
     color: #2f3542;
 }
+
+input:focus {
+    outline: none;
+    border-bottom-width: 2px;
+    padding-bottom: 8px;
+}
+
 #currentPage{
     text-align: center;
     font-family: roboto;
@@ -144,4 +160,7 @@ input{
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: none;
+}
+#bottomButtons{
+    text-align: center;
 }

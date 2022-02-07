@@ -8,14 +8,18 @@
     <body>
         <div class="card">
             <div class="formId">
-                <label>Name:</label><br>
-                <input type="text" id="username" required><br>
-                <label>Password:</label><br>
-                <input type="password" id="password" required>
-                <h5 id="loginError"></h5>
-                <button  onclick="login()" class="button">Login</button><br><br>
-                <a href="createUser.html">Create account</a>
-                <a href="passwordReset.html">Forgot password?</a>
+                <h2>Get into your account</h2>
+                <form autocomplete="off">
+                    <input type="text" id="username" required placeholder="Insert username...">
+                    <br>
+                    <input type="password" id="password" required placeholder="Insert password...">
+                    <h5 id="loginError"></h5>
+                    <button type="submit" onclick="login()" class="button">Login</button><br><br>
+                </form>
+                <div id="bottomButtons">
+                    <a href="createUser.html">Create account</a>
+                    <a href="passwordReset.html">Forgot password?</a>
+                </div>
             </div>
         </div>
         <div>
