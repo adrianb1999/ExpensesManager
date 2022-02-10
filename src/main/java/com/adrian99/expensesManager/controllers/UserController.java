@@ -19,6 +19,8 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.adrian99.expensesManager.emailVerification.TokenType.*;
 
@@ -41,21 +43,21 @@ public class UserController {
     }
 
     @GetMapping("/api/users/expenses")
-    public List<Expense> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
+    public Map<String,Object> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
                                           @RequestParam(name = "amountLessThan", required = false) Double amountLessThan,
                                           @RequestParam(name = "amountGreaterThan", required = false) Double amountGreaterThan,
                                           @RequestParam(name = "date", required = false) String date,
                                           @RequestParam(name = "dateAfter", required = false) String dateAfter,
                                           @RequestParam(name = "dateBefore", required = false) String dateBefore,
                                           @RequestParam(name = "payMethod", required = false) PayMethod payMethod,
-                                          @RequestParam(name = "category", required = false) Category category,
+                                          @RequestParam(name = "category", required = false) Set<Category> category,
                                           @RequestParam(name = "sortBy", required = false) SortBy sortBy,
                                           @RequestParam(name = "sortType", required = false) SortTypes sortType,
                                           @RequestParam(name = "pageSize", required = false) Integer pageSize,
                                           @RequestParam(name = "pageNum", required = false) Integer pageNum,
                                           Principal principal) {
         Long id = userService.findByUsername(principal.getName()).getId();
-        return expenseService.findAllByFilters(
+        Map<String, Object> expenses = expenseService.findAllByFilters(
                 id,
                 amount,
                 amountLessThan,
@@ -70,6 +72,7 @@ public class UserController {
                 pageSize,
                 pageNum
         );
+        return expenses;
     }
 
     @PostMapping("/api/createUser")
@@ -153,20 +156,71 @@ public class UserController {
         return expenseService.save(expense);
     }
 
+    @PutMapping("/api/users/expenses/{expenseId}")
+    public Expense editOrAddExpense(@RequestBody @Valid Expense newExpense, @PathVariable Long expenseId){
+        Expense currentExpense = expenseService.findById(expenseId);
+
+        newExpense.setId(currentExpense.getId());
+        newExpense.setUsers(currentExpense.getUsers());
+
+        return expenseService.save(newExpense);
+    }
+
     @DeleteMapping("/api/users/expenses/{expenseId}")
     public void deleteUserExpense(@PathVariable Long expenseId, Principal principal) {
         Long userId = userService.findByUsername(principal.getName()).getId();
         expenseService.deleteByIdAndUserId(userId, expenseId);
     }
 
-    @PutMapping("/api/users/{id}")
-    public User saveOrUpdate(@RequestBody User newUser, @PathVariable Long id) {
-        User updateUser = userService.findById(id);
+    @DeleteMapping("/api/users/expenses")
+    public void deleteMultipleExpenses(@RequestParam(name = "expenseIds") Set<Long> idList){
+        idList.forEach(aLong -> {
+            if(expenseService.findById(aLong) == null) {
+                System.out.println("Exista deja id = " + aLong);
+                throw new ApiRequestException("Expense with id " + aLong + " does not exist!");
+            }
+        });
+        expenseService.deleteAllById(idList);
+    }
 
-        if (updateUser == null) {
-            newUser.setId(id);
-            return userService.save(newUser);
+    @PutMapping("/api/users")
+    public User saveOrUpdate(@RequestBody User newUser, Principal principal) {
+        User updateUser = userService.findByUsername(principal.getName());
+
+        if (updateUser != null) {
+           if(newUser.getEmail() != null){
+               if(newUser.getEmail().isEmpty())
+                   throw new ApiRequestException("Email cannot be null!");
+
+               if(userService.findByEmail(newUser.getEmail()) != null)
+                   throw new ApiRequestException("Email already used!");
+
+               if(Objects.equals(updateUser.getEmail(), newUser.getEmail())) {
+                   throw new ApiRequestException("The email cannot be the same!");
+               }
+               updateUser.setEmail(newUser.getEmail());
+           }
+
+           if(newUser.getUsername() != null){
+               if(newUser.getUsername().isEmpty())
+                   throw new ApiRequestException("Username cannot be empty");
+
+               if(userService.findByUsername(newUser.getUsername()) != null)
+                   throw new ApiRequestException("Username already used!");
+
+               if(Objects.equals(updateUser.getUsername(),newUser.getUsername()))
+                   throw new ApiRequestException("The username cannot be the same!");
+               updateUser.setUsername(newUser.getUsername());
+           }
+
+           if(newUser.getPassword() != null) {
+               if(newUser.getPassword().isEmpty())
+                   throw new ApiRequestException("Password cannot be empty");
+               updateUser.setPassword(newUser.getPassword());
+           }
+           return userService.save(updateUser);
         }
+
         newUser.setId(updateUser.getId());
         return userService.save(newUser);
     }
@@ -181,6 +235,13 @@ public class UserController {
 
         Long userId = userService.findByUsername(principal.getName()).getId();
 
-        return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(7), LocalDate.now());
+        return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(6), LocalDate.now());
+    }
+    @GetMapping("/api/lastMonthsTotalPerMonth")
+    public List<Map<String, Double>> expensesByMonth(Principal principal) {
+
+        Long userId = userService.findByUsername(principal.getName()).getId();
+
+        return expenseCustomRepository.totalExpensesByLastNMonths(userId, 11);
     }
 }

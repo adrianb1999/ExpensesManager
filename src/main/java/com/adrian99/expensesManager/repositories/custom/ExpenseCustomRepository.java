@@ -9,9 +9,10 @@ import com.adrian99.expensesManager.customQueries.SortTypes;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface ExpenseCustomRepository {
-    List<Expense> findAllByFilters(Long userId,
+    Map<String, Object> findAllByFilters(Long userId,
                                    Double amount,
                                    Double amountLessThan,
                                    Double amountGreaterThan,
@@ -19,11 +20,12 @@ public interface ExpenseCustomRepository {
                                    String dateAfter,
                                    String dateBefore,
                                    PayMethod payMethod,
-                                   Category category,
+                                   Set<Category> category,
                                    SortBy sortBy,
                                    SortTypes sortType,
                                    Integer pageSize,
                                    Integer pageNum);
     void deleteByIdAndUserId(Long userId, Long expenseId);
     List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate);
+    List<Map<String, Double>> totalExpensesByLastNMonths(Long userId, Integer numOfMonth);
 }
