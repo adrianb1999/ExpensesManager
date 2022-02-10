@@ -42,6 +42,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteAllById(Iterable<? extends Long> longs) {
+        userRepository.deleteAllById(longs);
+    }
+
+    @Override
     public Optional<User> findOne(Predicate predicate) {
         return Optional.empty();
     }
@@ -89,5 +94,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> findAll(Predicate predicate, Pageable pageable) {
         return userRepository.findAll(predicate, pageable);
+    }
+
+    @Override
+    public long count(Predicate predicate) {
+        return userRepository.count(predicate);
     }
 }

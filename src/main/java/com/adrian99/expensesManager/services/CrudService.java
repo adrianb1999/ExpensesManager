@@ -11,4 +11,6 @@ public interface CrudService<T, ID>{
     <S extends T> Iterable<S> saveAll(Iterable<S> entities);
 
     void deleteById(ID id);
+
+    void deleteAllById(Iterable<? extends ID> ids);
 }

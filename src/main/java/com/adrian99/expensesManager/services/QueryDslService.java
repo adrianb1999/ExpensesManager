@@ -12,4 +12,5 @@ public interface QueryDslService <T> {
      Iterable<T> findAll(Predicate predicate);
      Iterable<T> findAll(Predicate predicate, Sort sort);
      Page<T> findAll(Predicate predicate, Pageable pageable);
+     long count(Predicate predicate);
 }

@@ -40,6 +40,11 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     @Override
+    public void deleteAllById(Iterable<? extends Long> longs) {
+        verificationTokenRepository.deleteAllById(longs);
+    }
+
+    @Override
     public VerificationToken isTokenValid(String token) {
         VerificationToken currentToken = findByToken(token);
 
