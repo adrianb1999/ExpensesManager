@@ -1,5 +1,6 @@
 package com.adrian99.expensesManager.customQueries;
 
+import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.model.*;
 import com.adrian99.expensesManager.model.QExpense;
 import com.querydsl.core.BooleanBuilder;
@@ -7,7 +8,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.querydsl.QSort;
 import org.springframework.stereotype.Component;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Component
 public class ExpenseQueries {
@@ -18,9 +21,12 @@ public class ExpenseQueries {
                 return new QSort(QExpense.expense.date.asc());
             return new QSort(QExpense.expense.date.desc());
         }
-        if (sortType.equals(SortTypes.ASC))
-            return new QSort(QExpense.expense.amount.asc());
-        return new QSort(QExpense.expense.amount.desc());
+        if (sortBy.equals(SortBy.AMOUNT)) {
+            if (sortType.equals(SortTypes.ASC))
+                return new QSort(QExpense.expense.amount.asc());
+            return new QSort(QExpense.expense.amount.desc());
+        }
+        return new QSort(QExpense.expense.id.asc());
     }
 
     public BooleanBuilder customPredicate(Long userId,
@@ -31,7 +37,7 @@ public class ExpenseQueries {
                                           String dateAfter,
                                           String dateBefore,
                                           PayMethod payMethod,
-                                          Category category) {
+                                          Set<Category> category) {
         QExpense qExpense = QExpense.expense;
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -41,11 +47,21 @@ public class ExpenseQueries {
         booleanBuilder.and(amountPredicate(amount, amountLessThan, amountGreaterThan));
         booleanBuilder.and(datePredicate(date, dateAfter, dateBefore));
 
-        if (category != null)
-            booleanBuilder.and(qExpense.category.eq(category));
-
         if (payMethod != null)
             booleanBuilder.and(qExpense.payMethod.eq(payMethod));
+
+        if (category != null) {
+            booleanBuilder.and(categoryPredicate(category));
+        }
+
+        return booleanBuilder;
+    }
+
+    private BooleanBuilder categoryPredicate(Set<Category> categories) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        QExpense expense = QExpense.expense;
+        categories.forEach(category -> booleanBuilder.or(expense.category.eq(category)));
 
         return booleanBuilder;
     }
@@ -71,24 +87,53 @@ public class ExpenseQueries {
     private BooleanExpression datePredicate(String date, String dateAfter, String dateBefore) {
         QExpense qExpense = QExpense.expense;
 
-        if (date != null) {
-            LocalDate localDate = LocalDate.parse(date);
+        if (date != null && !date.isEmpty()) {
+            LocalDate localDate;
+            try {
+                localDate = LocalDate.parse(date);
+            } catch (DateTimeException e) {
+                throw new ApiRequestException("Invalid data format!");
+            }
             return qExpense.date.eq(localDate);
         }
 
-        if (dateBefore != null && dateAfter != null) {
-            LocalDate localDateBefore = LocalDate.parse(dateBefore);
-            LocalDate localDateAfter = LocalDate.parse(dateAfter);
+        if (dateBefore != null && dateAfter != null && !dateBefore.isEmpty() && !dateAfter.isEmpty()) {
+
+            LocalDate localDateBefore;
+            LocalDate localDateAfter;
+            try {
+                localDateBefore = LocalDate.parse(dateBefore);
+                localDateAfter = LocalDate.parse(dateAfter);
+            } catch (DateTimeException e) {
+                throw new ApiRequestException("Invalid data format!");
+            }
+
             return qExpense.date.between(localDateAfter, localDateBefore);
         }
 
-        if (dateBefore != null) {
-            LocalDate localDateBefore = LocalDate.parse(dateBefore);
+        if (dateBefore != null && !dateBefore.isEmpty()) {
+
+            LocalDate localDateBefore;
+
+            try {
+                localDateBefore = LocalDate.parse(dateBefore);
+            } catch (DateTimeException e) {
+                throw new ApiRequestException("Invalid data format!");
+            }
+
             return qExpense.date.lt(localDateBefore);
         }
 
-        if (dateAfter != null) {
-            LocalDate localDateAfter = LocalDate.parse(dateAfter);
+        if (dateAfter != null && !dateAfter.isEmpty()) {
+
+            LocalDate localDateAfter;
+
+            try {
+                localDateAfter = LocalDate.parse(dateAfter);
+            } catch (DateTimeException e) {
+                throw new ApiRequestException("Invalid data format!");
+            }
+
             return qExpense.date.gt(localDateAfter);
         }
 
