@@ -10,6 +10,9 @@ import com.adrian99.expensesManager.repositories.custom.implementation.ExpenseCu
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.adrian99.expensesManager.services.UserService;
 import com.adrian99.expensesManager.services.VerificationTokenService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,19 +46,19 @@ public class UserController {
     }
 
     @GetMapping("/api/users/expenses")
-    public Map<String,Object> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
-                                          @RequestParam(name = "amountLessThan", required = false) Double amountLessThan,
-                                          @RequestParam(name = "amountGreaterThan", required = false) Double amountGreaterThan,
-                                          @RequestParam(name = "date", required = false) String date,
-                                          @RequestParam(name = "dateAfter", required = false) String dateAfter,
-                                          @RequestParam(name = "dateBefore", required = false) String dateBefore,
-                                          @RequestParam(name = "payMethod", required = false) PayMethod payMethod,
-                                          @RequestParam(name = "category", required = false) Set<Category> category,
-                                          @RequestParam(name = "sortBy", required = false) SortBy sortBy,
-                                          @RequestParam(name = "sortType", required = false) SortTypes sortType,
-                                          @RequestParam(name = "pageSize", required = false) Integer pageSize,
-                                          @RequestParam(name = "pageNum", required = false) Integer pageNum,
-                                          Principal principal) {
+    public Map<String, Object> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
+                                                @RequestParam(name = "amountLessThan", required = false) Double amountLessThan,
+                                                @RequestParam(name = "amountGreaterThan", required = false) Double amountGreaterThan,
+                                                @RequestParam(name = "date", required = false) String date,
+                                                @RequestParam(name = "dateAfter", required = false) String dateAfter,
+                                                @RequestParam(name = "dateBefore", required = false) String dateBefore,
+                                                @RequestParam(name = "payMethod", required = false) PayMethod payMethod,
+                                                @RequestParam(name = "category", required = false) Set<Category> category,
+                                                @RequestParam(name = "sortBy", required = false) SortBy sortBy,
+                                                @RequestParam(name = "sortType", required = false) SortTypes sortType,
+                                                @RequestParam(name = "pageSize", required = false) Integer pageSize,
+                                                @RequestParam(name = "pageNum", required = false) Integer pageNum,
+                                                Principal principal) {
         Long id = userService.findByUsername(principal.getName()).getId();
         Map<String, Object> expenses = expenseService.findAllByFilters(
                 id,
@@ -78,7 +81,7 @@ public class UserController {
     @PostMapping("/api/createUser")
     public User createUser(@RequestBody @Valid User user) throws MessagingException {
 
-        if(userService.findByEmail(user.getEmail()) != null)
+        if (userService.findByEmail(user.getEmail()) != null)
             throw new ApiRequestException("Email already used!");
 
         if (userService.findByUsername(user.getUsername()) != null)
@@ -111,11 +114,10 @@ public class UserController {
 
     @PostMapping("/api/passwordResetSendLink")
     public void sendResetToken(@RequestBody User user) throws MessagingException {
-
-        User currentUser = userService.findByUsername(user.getUsername());
+        User currentUser = userService.findByEmail(user.getEmail());
 
         if (currentUser == null)
-            throw new ApiRequestException("The username doesn't exist!");
+            throw new ApiRequestException("The email doesn't exist!");
         if (!currentUser.getActive())
             throw new ApiRequestException("The account is not activated!");
 
@@ -157,7 +159,7 @@ public class UserController {
     }
 
     @PutMapping("/api/users/expenses/{expenseId}")
-    public Expense editOrAddExpense(@RequestBody @Valid Expense newExpense, @PathVariable Long expenseId){
+    public Expense editOrAddExpense(@RequestBody @Valid Expense newExpense, @PathVariable Long expenseId) {
         Expense currentExpense = expenseService.findById(expenseId);
 
         newExpense.setId(currentExpense.getId());
@@ -169,60 +171,76 @@ public class UserController {
     @DeleteMapping("/api/users/expenses/{expenseId}")
     public void deleteUserExpense(@PathVariable Long expenseId, Principal principal) {
         Long userId = userService.findByUsername(principal.getName()).getId();
+        //TODO Or I can verify that here
         expenseService.deleteByIdAndUserId(userId, expenseId);
     }
 
     @DeleteMapping("/api/users/expenses")
-    public void deleteMultipleExpenses(@RequestParam(name = "expenseIds") Set<Long> idList){
+    public void deleteMultipleExpenses(@RequestParam(name = "expenseIds") Set<Long> idList, Principal principal) {
+        User currentUser = userService.findByUsername(principal.getName());
         idList.forEach(aLong -> {
-            if(expenseService.findById(aLong) == null) {
-                System.out.println("Exista deja id = " + aLong);
+            if (expenseService.findById(aLong) == null) {
                 throw new ApiRequestException("Expense with id " + aLong + " does not exist!");
+            }
+            if(expenseService.findById(aLong).getUsers() != currentUser){
+                throw new ApiRequestException("You cannot delete another user expense!");
             }
         });
         expenseService.deleteAllById(idList);
     }
 
-    @PutMapping("/api/users")
-    public User saveOrUpdate(@RequestBody User newUser, Principal principal) {
+    @PutMapping("/api/users/updateInfo")
+    public User saveOrUpdate(@RequestBody Map<String, String> userInfo, Principal principal) {
+
+        if(userInfo.get("password") == null)
+            throw new ApiRequestException("Password is required!");
+
         User updateUser = userService.findByUsername(principal.getName());
+        if(updateUser == null)
+            throw new ApiRequestException("Hmm");
+        if(!Objects.equals(userInfo.get("password"), updateUser.getPassword()))
+            throw new ApiRequestException("Password incorrect");
 
-        if (updateUser != null) {
-           if(newUser.getEmail() != null){
-               if(newUser.getEmail().isEmpty())
-                   throw new ApiRequestException("Email cannot be null!");
+        if (userInfo.get("email") != null) {
+            if (userInfo.get("email").isEmpty())
+                throw new ApiRequestException("Email cannot be null!");
 
-               if(userService.findByEmail(newUser.getEmail()) != null)
-                   throw new ApiRequestException("Email already used!");
+            // TODO EMAIL VALIDATION!
 
-               if(Objects.equals(updateUser.getEmail(), newUser.getEmail())) {
-                   throw new ApiRequestException("The email cannot be the same!");
-               }
-               updateUser.setEmail(newUser.getEmail());
-           }
+            if (Objects.equals(updateUser.getEmail(), userInfo.get("email"))) {
+                throw new ApiRequestException("The email cannot be the same!");
+            }
 
-           if(newUser.getUsername() != null){
-               if(newUser.getUsername().isEmpty())
-                   throw new ApiRequestException("Username cannot be empty");
+            if (userService.findByEmail(userInfo.get("email")) != null)
+                throw new ApiRequestException("Email already used!");
 
-               if(userService.findByUsername(newUser.getUsername()) != null)
-                   throw new ApiRequestException("Username already used!");
-
-               if(Objects.equals(updateUser.getUsername(),newUser.getUsername()))
-                   throw new ApiRequestException("The username cannot be the same!");
-               updateUser.setUsername(newUser.getUsername());
-           }
-
-           if(newUser.getPassword() != null) {
-               if(newUser.getPassword().isEmpty())
-                   throw new ApiRequestException("Password cannot be empty");
-               updateUser.setPassword(newUser.getPassword());
-           }
-           return userService.save(updateUser);
+            updateUser.setEmail(userInfo.get("email"));
         }
 
-        newUser.setId(updateUser.getId());
-        return userService.save(newUser);
+        if (userInfo.get("username") != null) {
+            if (userInfo.get("username").isEmpty())
+                throw new ApiRequestException("Username cannot be empty");
+
+            if (Objects.equals(updateUser.getUsername(), userInfo.get("username")))
+                throw new ApiRequestException("The username cannot be the same!");
+
+            if (userService.findByUsername(userInfo.get("username")) != null)
+                throw new ApiRequestException("Username already used!");
+
+            updateUser.setUsername(userInfo.get("username"));
+        }
+
+        if (userInfo.get("newPassword") != null) {
+            if (userInfo.get("newPassword").isEmpty())
+                throw new ApiRequestException("Password cannot be empty");
+            if(Objects.equals(updateUser.getPassword(), userInfo.get("newPassword")))
+                throw new ApiRequestException("The password cannot be the same!");
+
+            updateUser.setPassword(userInfo.get("newPassword"));
+        }
+
+        return userService.save(updateUser);
+
     }
 
     @DeleteMapping("/api/users/{id}")
@@ -230,18 +248,51 @@ public class UserController {
         userService.deleteById(id);
     }
 
-    @GetMapping("/api/lastWeekTotalPerDays")
+    @GetMapping("/api/users/statistics/lastWeekTotalPerDays")
     public List<Map<String, Object>> expensesByDay(Principal principal) {
-
         Long userId = userService.findByUsername(principal.getName()).getId();
 
         return expenseCustomRepository.totalExpensesByDay(userId, LocalDate.now().minusDays(6), LocalDate.now());
     }
-    @GetMapping("/api/lastMonthsTotalPerMonth")
-    public List<Map<String, Double>> expensesByMonth(Principal principal) {
 
+    @GetMapping("/api/users/statistics/lastMonthsTotalPerMonthByCategory/{numOfMonths}")
+    public List<Map<String, Object>> expensesByMonthByCategory(@PathVariable Integer numOfMonths, Principal principal) {
         Long userId = userService.findByUsername(principal.getName()).getId();
 
-        return expenseCustomRepository.totalExpensesByLastNMonths(userId, 11);
+        return expenseCustomRepository.totalExpensesByLastNMonthsByCategory(userId, numOfMonths - 1);
     }
+
+    @GetMapping("/api/users/statistics/dayAverage")
+    public Map<String, Double> getDayAverage(Principal principal) {
+        Long userId = userService.findByUsername(principal.getName()).getId();
+
+        return expenseService.dayAverage(userId, LocalDate.now().minusMonths(6), LocalDate.now());
+    }
+
+    @GetMapping("/api/users/statistics/monthAverage")
+    public Map<String, Double> getMonthAverage(Principal principal) {
+        Long userId = userService.findByUsername(principal.getName()).getId();
+
+        return expenseService.monthAverage(userId, LocalDate.now().minusMonths(6), LocalDate.now());
+    }
+
+    @GetMapping("/api/users/statistics/totalSpent")
+    public Map<String, Object> getTotalSpent(Principal principal){
+        Long userId = userService.findByUsername(principal.getName()).getId();
+
+        return expenseService.totalSpent(userId);
+    }
+
+    @PostMapping(value = "/api/changePassword", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> passwordBody, Principal principal) {
+        User currentUser = userService.findByUsername(principal.getName());
+        if (!Objects.equals(currentUser.getPassword(), passwordBody.get("oldPassword")))
+            throw new ApiRequestException("Password is wrong!");
+
+        currentUser.setPassword(passwordBody.get("newPassword"));
+        userService.save(currentUser);
+
+        return new ResponseEntity<>("{\"message\":\"Password updated successfully!\"}", HttpStatus.OK);
+    }
+
 }

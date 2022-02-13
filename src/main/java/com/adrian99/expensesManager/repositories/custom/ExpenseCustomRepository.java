@@ -27,5 +27,8 @@ public interface ExpenseCustomRepository {
                                    Integer pageNum);
     void deleteByIdAndUserId(Long userId, Long expenseId);
     List<Map<String, Object>> totalExpensesByDay(Long userId, LocalDate firstDate, LocalDate secondDate);
-    List<Map<String, Double>> totalExpensesByLastNMonths(Long userId, Integer numOfMonth);
+    List<Map<String, Object>> totalExpensesByLastNMonthsByCategory(Long userId, Integer numOfMonth);
+    Map<String, Double> dayAverage(Long userId, LocalDate firstDate, LocalDate secondDate);
+    Map<String, Double> monthAverage(Long userId, LocalDate firstDate, LocalDate secondDate);
+    Map<String, Object> totalSpent (Long userId);
 }

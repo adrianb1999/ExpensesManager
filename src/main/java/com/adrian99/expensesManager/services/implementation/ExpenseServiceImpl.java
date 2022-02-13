@@ -127,8 +127,23 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Map<String, Double>> totalExpensesByLastNMonths(Long userId, Integer numOfMonth) {
-        return expenseRepository.totalExpensesByLastNMonths(userId, numOfMonth);
+    public List<Map<String, Object>> totalExpensesByLastNMonthsByCategory(Long userId, Integer numOfMonth) {
+        return expenseRepository.totalExpensesByLastNMonthsByCategory(userId, numOfMonth);
+    }
+
+    @Override
+    public Map<String, Double> dayAverage(Long userId, LocalDate firstDate, LocalDate secondDate) {
+        return expenseRepository.dayAverage(userId, firstDate, secondDate);
+    }
+
+    @Override
+    public Map<String, Double> monthAverage(Long userId, LocalDate firstDate, LocalDate secondDate) {
+        return expenseRepository.monthAverage(userId, firstDate, secondDate);
+    }
+
+    @Override
+    public Map<String, Object> totalSpent(Long userId) {
+        return expenseRepository.totalSpent(userId);
     }
 
     //QueryDSL Methods
