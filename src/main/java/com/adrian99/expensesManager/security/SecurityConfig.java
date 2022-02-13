@@ -27,7 +27,6 @@ import javax.crypto.SecretKey;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final ApplicationUserService applicationUserService;
-
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
 
@@ -51,12 +50,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManagerBean(), jwtConfig, secretKey))
-                .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey, applicationUserService), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/api/users/*/*").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/api/createUser", "/api/categories/**","/api/registrationConfirm","/api/passwordReset", "/api/passwordResetSendLink").permitAll()
                 .antMatchers("/index.html","/index","/login.html","/","/createUser.html","/registrationConfirm.html","/passwordResetForm.html","/passwordReset.html").permitAll()
-                .antMatchers("/css/style.css","/js/main.js").permitAll()
+                .antMatchers("/css/user.css","/js/main.js").permitAll()
                 .anyRequest()
                 .authenticated();
     }
@@ -89,4 +88,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 }
