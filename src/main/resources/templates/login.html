@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeLeaf.org">
     <head>
         <script th:src="@{/js/main.js}"></script>
-        <link th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/user.css}" rel="stylesheet" type="text/css" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,11 +17,11 @@
             <div class="formId">
                 <h2>Get into your account</h2>
                 <form autocomplete="off" id="login-form">
-                    <input type="text" id="username" required placeholder="Insert username...">
+                    <input type="text" class="formInput" id="username" required placeholder="Insert username...">
                     <br>
-                    <input type="password" id="password" required placeholder="Insert password...">
-                    <h5 id="loginError"></h5>
-                    <button type="submit" class="button">Login</button><br><br>
+                    <input type="password" class="formInput" id="password" required placeholder="Insert password...">
+                    <br><br>
+                    <button type="submit" class="button loginButton">Login</button><br><br>
                 </form>
                 <div id="bottomButtons">
                     <a href="createUser.html">Create account</a>

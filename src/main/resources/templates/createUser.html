@@ -2,26 +2,33 @@
 <html lang="en" xmlns:th="http://www.thymeLeaf.org">
     <head>
         <script th:src="@{/js/main.js}"></script>
-        <link th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/user.css}" rel="stylesheet" type="text/css" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <title>Test Client</title>
     </head>
-    <body>
+    <body class="createUser">
         <div class="card">
-            <label >Name:</label><br>
-            <input type="text" id="createUsername"><br>
-
-            <label >Email:</label><br>
-            <input type="email" id="createEmail"><br>
-
-            <label >Password:</label><br>
-            <input type="password" id="createPassword"><br>
-
-            <label >Confirm Password:</label><br>
-            <input type="password" id="createConfirmPassword"><br>
-
-            <h5 id="createUserMessage"></h5>
-            <button type="button" onclick="createUser()" class="button">Create account</button>
-            <a href="login.html">Login</a>
+            <div class="formId">
+                <h2>Create new account</h2>
+                <form autocomplete="off" id="createAccountForm">
+                    <input type="text" class="formInput" id="createUsername" required placeholder="Insert username..."><br>
+                    <input type="email" class="formInput" id="createEmail" required placeholder="Insert email..."><br>
+                    <input type="password" class="formInput" id="passwordInput" required placeholder="Insert password..." onkeyup="matchChecking('passwordInput', 'confirmPasswordInput','passWordMessage')">
+                    <input type="password" class="formInput"id="confirmPasswordInput" required placeholder="Repeat password..." onkeyup="matchChecking('passwordInput', 'confirmPasswordInput','passWordMessage')">
+                    <p class="message" id="passWordMessage"></p>
+                    <br>
+                    <button type="submit" class="button loginButton">Create account</button>
+                </form>
+                <div id="bottomButtons"><br>
+                    <a href="login.html">Login</a>
+                </div>
+            </div>
         </div>
     </body>
 </html>
