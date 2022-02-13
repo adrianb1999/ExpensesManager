@@ -26,4 +26,12 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         return query.select(qUser).from(qUser)
                 .where(qUser.username.eq(username)).fetchFirst();
     }
+    @Transactional
+    @Override
+    public User findByEmail(String email) {
+        JPAQuery<User> query = new JPAQuery<>(entityManager);
+        QUser qUser = QUser.user;
+        return query.select(qUser).from(qUser)
+                .where(qUser.email.eq(email)).fetchFirst();
+    }
 }

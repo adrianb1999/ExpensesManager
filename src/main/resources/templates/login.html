@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeLeaf.org">
+    <head>
+        <script th:src="@{/js/main.js}"></script>
+        <link th:href="@{/css/user.css}" rel="stylesheet" type="text/css" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <title>Test Client</title>
+    </head>
+    <body class="login"><div class="total">
+        <div class="card">
+            <div class="formId">
+                <h2>Get into your account</h2>
+                <form autocomplete="off" id="login-form">
+                    <input type="text" class="formInput" id="username" required placeholder="Insert username...">
+                    <br>
+                    <input type="password" class="formInput" id="password" required placeholder="Insert password...">
+                    <br><br>
+                    <button type="submit" class="button loginButton">Login</button><br><br>
+                </form>
+                <div id="bottomButtons">
+                    <a href="createUser.html">Create account</a>
+                    <a href="passwordReset.html">Forgot password?</a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h1 th:text="${TokenState}"></h1><br>
+        </div>
+    </div>
+    </body>
+</html>

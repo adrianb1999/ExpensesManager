@@ -1,0 +1,280 @@
+<html>
+<head>
+    <script th:src="@{/js/main.js}"></script>
+    <link th:href="@{/css/user.css}" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+</head>
+
+<body class="user">
+<div class="page">
+    <div class="left">
+        <div class="logo">
+            <h2>Expenses Manager by adrian99</h2>
+        </div>
+        <div class="leftButtons btn-toggle-panel" data-target="#tableExp">
+            <div class="icon">
+                <span class="material-icons md-36">table_view</span>
+            </div>
+            <h3>Expenses</h3>
+        </div>
+        <div class="leftButtons btn-toggle-panel" data-target="#statistics">
+            <div class="icon">
+                <span class="material-icons md-36">data_usage</span>
+            </div>
+            <h3>Statistics</h3>
+        </div>
+        <div class="leftButtons btn-toggle-panel buttonActive" data-target="#userInfo">
+            <div class="icon">
+                <span class="material-icons md-36">account_circle</span>
+            </div>
+            <h3> User info</h3>
+        </div>
+        <div class="leftButtons logout" id="logout">
+            <div class="icon">
+                <span class="material-icons md-36">logout</span>
+            </div>
+            <h3>Logout</h3>
+        </div>
+    </div>
+    <div class="right">
+        <div class="panels">
+            <div class="panel" id="userInfo">
+                <div class="userUpper">
+                    <h2>User details</h2>
+                </div>
+                <div class="userContent panel-body">
+                    <div class="accountInfo username">
+                        <h3>Change username</h3>
+                        <form action="#" id="updateUsernameForm" autocomplete="off">
+                            <input type="text" id="userInput" placeholder="New username" onkeyup="matchChecking('userInput', 'confirmUserInput','usernameWordMessage')">
+                            <input type="text" id="confirmUserInput" placeholder="Confirm new username" onkeyup="matchChecking('userInput', 'confirmUserInput','usernameWordMessage')">
+                            <p class="message" id="usernameWordMessage"></p>
+                            <input type="password" id="passwordInputUsername" placeholder="Password">
+                            <button type="submit" class="button">Save</button>
+                        </form>
+                    </div>
+                    <div class="accountInfo email">
+                        <h3>Change email</h3>
+                        <form action="#" id="updateEmailForm" autocomplete="off">
+                            <input type="email" id="emailInput" placeholder="New email" onkeyup="matchChecking('emailInput', 'confirmEmailInput','emailWordMessage')">
+                            <input type="email" id="confirmEmailInput" placeholder="Confirm new email" onkeyup="matchChecking('emailInput', 'confirmEmailInput','emailWordMessage')">
+                            <p class="message" id="emailWordMessage"></p>
+                            <input type="password" id="passwordInputEmail" placeholder="Password">
+                            <button type="submit" class="button">Save</button>
+                        </form>
+                    </div>
+                    <div class="accountInfo password">
+                        <h3>Change password</h3>
+                        <form action="#" id="updatePasswordForm" autocomplete="off">
+                            <input type="password" id="passwordInput" placeholder="New password" onkeyup="matchChecking('passwordInput', 'confirmPasswordInput','passWordMessage')">
+                            <input type="password" id="confirmPasswordInput" placeholder="Confirm new password" onkeyup="matchChecking('passwordInput', 'confirmPasswordInput','passWordMessage')">
+                            <p class="message" id="passWordMessage"></p>
+                            <input type="password" id="oldPasswordInput" placeholder="Old password">
+                            <button type="submit" class="button">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="panel active" id="tableExp">
+                <div class="tableInfo">
+                    <div class="tableInfoLeft">
+                        <h2>All expenses</h2>
+                        <button class="button addFilter" onclick="openFilterModal()">Add filter</button>
+                        <button class="button deleteSelection" onclick="deleteExpenses()" id="deleteSelectedExpenses"
+                                disabled>Delete selection
+                        </button>
+                    </div>
+                    <div class="tableInfoRight">
+                        <button class="button addExpenseButton" onclick="openExpenseModal()">
+                            Add expense
+                        </button>
+                    </div>
+                </div>
+                <div class="tableContent panel-body">
+                    <div id="tableLimits">
+                        <table id="expensesTable">
+                            <thead>
+                            <tr>
+                                <th style="width: 70px" id="selectBox">Select</th>
+                                <th style="width: 100px" id="sortDate">Date</th>
+                                <th style="max-width: 170px">Title</th>
+                                <th>Category</th>
+                                <th id="sortAmount">Amount</th>
+                                <th>Pay method</th>
+                                <th>Details</th>
+                                <th style="width: 85px">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="tableFooter">
+                        <div class="leftDiv">
+                            <h4 id="expensesSize">Showing 1 to 50 of 150 entries</h4>
+                        </div>
+                        <div class="middleDiv">
+                        </div>
+                        <div class="rightDiv">
+                            <button id="pageDecrease" onclick="getExpensesPage(-1, null)" class="button">
+                                <span class="material-icons">
+                                                           navigate_before
+                                                        </span>
+                            </button>
+                            <h4 id="currentPage"></h4>
+                            <button id="pageIncrease" onclick="getExpensesPage(1, null)" class="button">
+                                <span class="material-icons">
+                                                            navigate_next
+                                                        </span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" id="statistics">
+                <div class="userUpper userStatisticHead">
+                    <h2>User statistics</h2>
+                </div>
+                <div class="statisticsContent panel-body">
+                    <div class="headStatistics">
+                        <div class="shortStatistics totalSpent">
+                            <h3>Total spent: </h3>
+                            <h2 id="totalSpentText">Total spent: </h2>
+                        </div>
+                        <div class="shortStatistics dayAverage">
+                            <h3 >Day average: </h3>
+                            <h2 id="dayAverageText">Day average: </h2>
+                        </div>
+                        <div class="shortStatistics monthAverage">
+                            <h3>Month average: </h3>
+                            <h2 id="monthAverageText">Month average: </h2>
+                        </div>
+                    </div>
+                    <div class="contentStatistics">
+                        <div class="charts">
+                            <div class="chartTitle">
+                                <h3>Last week expenses</h3>
+                            </div>
+                            <div class="chartContent">
+                                <canvas id="myChart" width="500" height="300"></canvas>
+                            </div>
+                        </div>
+                        <div class="charts">
+                        <div class="chartTitle">
+                            <h3>Last 6 months expenses</h3>
+                        </div>
+                        <div class="chartContent">
+                            <canvas id="last6M" width="500" height="300"></canvas>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form action="#" autocomplete="off" id="expenseForm">
+            <h3 id="expenseFormTitle">Add expense</h3>
+            <input type="Text" id="title" placeholder="Expense title..."><br>
+            <select id="categories" name="categories" class="formSelect">
+                <option value="">Select category...</option>
+                <option value="FUEL">Fuel</option>
+                <option value="FOOD">Food</option>
+                <option value="DRINKS">Drinks</option>
+                <option value="SCHOOL">School</option>
+                <option value="BEAUTY">Beauty</option>
+                <option value="CULTURE">Culture</option>
+                <option value="HEALTH">Health</option>
+                <option value="GIFT">Gift</option>
+                <option value="CLOTHES">Clothes</option>
+                <option value="TRANSPORT">Transport</option>
+                <option value="EDUCATION">Education</option>
+                <option value="OTHER">Other</option>
+            </select><br>
+            <select id="payMethods" name="payMethods" class="formSelect">
+                <option value="">Select pay method...</option>
+                <option value="CARD">Card</option>
+                <option value="CASH">Cash</option>
+            </select><br>
+            <input type="number" id="amount" placeholder="Amount..." min="1"><br>
+
+            <input type="Text" id="details" placeholder="Details..."><br>
+
+            <input type="date" id="date" placeholder="Date..."><br>
+
+            <br>
+            <button class="button" id="addExpenseButton">Add expense</button>
+        </form>
+    </div>
+</div>
+<div id="filterModal" class="modal">
+    <div class="modal-filter-content">
+        <div class="filter-modal-content">
+            <span class="close">&times;</span>
+            <h2>Filters:</h2>
+            <h3>By amount:</h3>
+            <div class="amountDiv">
+                <select id="amountCategories" name="categories" class="formSelect" onchange="amountSwitch()">
+                    <option value="fixed" selected>Fix amount</option>
+                    <option value="interval">Interval</option>
+                </select>
+                <input type="number" class="amountFilter" id="amountFilter" placeholder="Amount"
+                       onchange="onChangeAmount()" min="0">
+                <div class="amountIntervalDiv">
+                <input type="number" class="amountFilter" id="amountMinFilter" placeholder="Min amount"
+                       onchange="onChangeMinAmount()" min="0">
+                <input type="number" class="amountFilter" id="amountMaxFilter" placeholder="Max amount"
+                       onchange="onChangeMaxAmount()" min="1">
+                </div>
+
+            </div>
+            <h3>By category</h3>
+
+            <button class="button filterButton" id="FUEL" onclick="addCategoryToList('FUEL')">Fuel</button>
+            <button class="button filterButton" id="FOOD" onclick="addCategoryToList('FOOD')">Food</button>
+            <button class="button filterButton" id="DRINKS" onclick="addCategoryToList('DRINKS')">Drinks</button>
+            <button class="button filterButton" id="SCHOOL" onclick="addCategoryToList('SCHOOL')">School</button>
+            <button class="button filterButton" id="BEAUTY" onclick="addCategoryToList('BEAUTY')">Beauty</button>
+            <button class="button filterButton" id="CULTURE" onclick="addCategoryToList('CULTURE')">Culture</button>
+            <button class="button filterButton" id="HEALTH" onclick="addCategoryToList('HEALTH')">Health</button>
+            <button class="button filterButton" id="GIFT" onclick="addCategoryToList('GIFT')">Gift</button>
+            <button class="button filterButton" id="CLOTHES" onclick="addCategoryToList('CLOTHES')">Clothes</button>
+            <button class="button filterButton" id="TRANSPORT" onclick="addCategoryToList('TRANSPORT')">Transport
+            </button>
+            <button class="button filterButton" id="EDUCATION" onclick="addCategoryToList('EDUCATION')">Education
+            </button>
+            <button class="button filterButton" id="OTHER" onclick="addCategoryToList('OTHER')">Other</button>
+
+            <h3>By pay methods</h3>
+
+            <button class="button filterButton" id="CASH" onclick="addPayMethodToList('CASH')">Cash</button>
+            <button class="button filterButton" id="CARD" onclick="addPayMethodToList('CARD')">Card</button>
+
+            <h3>By date</h3>
+            <div  class="amountDiv">
+                <select id="dateCategories" name="categories" class="formSelect" onchange="dateSwitch()">
+                    <option value="fixed" selected>Fix date</option>
+                    <option value="interval">Interval</option>
+                </select>
+                <input type="date" class="dateFilter" id="dateFilter" onchange="onChangeDate()">
+                <div class="amountIntervalDiv">
+                    <input type="date" class="dateFilter" id="firstDateFilter" onchange="onChangeFirstDate()">
+                    <input type="date" class="dateFilter" id="secondDateFilter" onchange="onChangeSecondDate()">
+                </div>
+            </div>
+            <br>
+            <button class="button" onclick="applyFilters()">Apply filters!</button>
+        </div>
+    </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+</body>
+</html>

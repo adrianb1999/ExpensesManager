@@ -1,11 +1,12 @@
 package com.adrian99.expensesManager.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.checkerframework.common.value.qual.DoubleVal;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Expense {
@@ -13,15 +14,24 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Title cannot be empty")
+    @NotEmpty(message = "Title cannot be empty")
+    private String title;
+
     @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "Category cannot be empty")
     private Category category;
 
+    @NotNull(message = "Date cannot be empty")
     private LocalDate date;
 
     @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "PayMethod cannot be empty")
     private PayMethod payMethod;
 
+    @NotNull(message = "Amount cannot be empty")
     private Double amount;
+
     private String details;
 
     @JsonIgnore
@@ -31,12 +41,14 @@ public class Expense {
     public Expense() {
     }
 
-    public Expense(Category category, LocalDate date, PayMethod payMethod, Double amount, String details) {
+    public Expense(String title, Category category, LocalDate date, PayMethod payMethod, Double amount, String details, User users) {
+        this.title = title;
         this.category = category;
         this.date = date;
         this.payMethod = payMethod;
         this.amount = amount;
         this.details = details;
+        this.users = users;
     }
 
     public Long getId() {
@@ -45,6 +57,14 @@ public class Expense {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Category getCategory() {

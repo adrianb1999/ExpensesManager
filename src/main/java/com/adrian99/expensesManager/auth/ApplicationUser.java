@@ -15,10 +15,11 @@ public class ApplicationUser implements UserDetails {
     private final String username;
     private final String password;
     private final Set<? extends GrantedAuthority> grantedAuthorities;
-
+    private final boolean enabled;
     public ApplicationUser(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
+        this.enabled = user.getActive();
         this.grantedAuthorities = Arrays.stream(user.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
@@ -56,6 +57,6 @@ public class ApplicationUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

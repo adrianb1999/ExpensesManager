@@ -1,5 +1,6 @@
 package com.adrian99.expensesManager.security;
 
+import com.adrian99.expensesManager.jwt.JwtConfig;
 import com.adrian99.expensesManager.jwt.JwtTokenVerifier;
 import com.adrian99.expensesManager.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import com.adrian99.expensesManager.services.implementation.ApplicationUserService;
@@ -18,17 +19,21 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import javax.crypto.SecretKey;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private ApplicationUserService applicationUserService;
+    private final ApplicationUserService applicationUserService;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
-    public SecurityConfig(ApplicationUserService applicationUserService) {
+    public SecurityConfig(ApplicationUserService applicationUserService, SecretKey secretKey, JwtConfig jwtConfig) {
         this.applicationUserService = applicationUserService;
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
     }
 
     @Override
@@ -44,11 +49,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManagerBean()))
-                .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter.class)
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManagerBean(), jwtConfig, secretKey))
+                .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey, applicationUserService), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/users/*/*").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/createUser", "/categories/**").permitAll()
+                .antMatchers("/api/users/*/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/createUser", "/api/categories/**","/api/registrationConfirm","/api/passwordReset", "/api/passwordResetSendLink").permitAll()
+                .antMatchers("/index.html","/index","/login.html","/","/createUser.html","/registrationConfirm.html","/passwordResetForm.html","/passwordReset.html").permitAll()
+                .antMatchers("/css/user.css","/js/main.js").permitAll()
                 .anyRequest()
                 .authenticated();
     }
@@ -71,7 +78,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return NoOpPasswordEncoder.getInstance();
@@ -82,4 +88,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 }
