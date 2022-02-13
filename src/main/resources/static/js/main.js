@@ -1,10 +1,3 @@
-function onLoadCustom() {
-    let button = document.getElementById("userButton");
-    button.addEventListener("click", () => {
-        console.log("Apasat")
-    })
-}
-
 function escapeHtml(unsafe)
 {
     return unsafe
@@ -46,6 +39,78 @@ function login() {
         });
 }
 
+function amountSwitch(){
+    let switchValue = document.getElementById("amountCategories")
+    if(switchValue.value === "fixed"){
+        document.getElementById("amountFilter").style.display = "block";
+        document.getElementById("amountMinFilter").style.display = "none";
+        document.getElementById("amountMaxFilter").style.display = "none";
+
+        document.getElementById("amountMinFilter").value = "";
+        document.getElementById("amountMaxFilter").value = "";
+
+    }
+    else{
+        document.getElementById("amountFilter").style.display = "none";
+        document.getElementById("amountMinFilter").style.display = "block";
+        document.getElementById("amountMaxFilter").style.display = "block";
+
+        document.getElementById("amountFilter").value = "";
+    }
+}
+
+function dateSwitch(){
+    let switchValue = document.getElementById("dateCategories")
+    if(switchValue.value === "fixed"){
+        document.getElementById("dateFilter").style.display = "block";
+        document.getElementById("firstDateFilter").style.display = "none";
+        document.getElementById("secondDateFilter").style.display = "none";
+
+        document.getElementById("firstDateFilter").value = "";
+        document.getElementById("secondDateFilter").value = "";
+    }
+    else{
+        document.getElementById("dateFilter").style.display = "none";
+        document.getElementById("firstDateFilter").style.display = "block";
+        document.getElementById("secondDateFilter").style.display = "block";
+
+        document.getElementById("dateFilter").value = "";
+    }
+}
+
+function logout(){
+    Swal.fire({
+        title: 'Wait!',
+        text: "Are you sure?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, logout!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            logoutUser()
+        }
+      })
+}
+
+function logoutUser(){
+    deleteAllCookies()
+    window.location.href = "login.html"
+}
+
+//stolen
+function deleteAllCookies() {
+    var cookies = document.cookie.split(";");
+
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        var eqPos = cookie.indexOf("=");
+        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+}
+
 var allExpenses
 var pageNum = 0
 var globalPageSize = 30
@@ -73,7 +138,22 @@ var firstDate = null
 var secondDate = null
 var date = null
 
+var passwordMatch = false
+var usernameMatch = false
+var emailMatch = false
 
+let categoriesList = ['FUEL',
+    'FOOD',
+    'DRINKS',
+    'SCHOOL',
+    'BEAUTY',
+    'CULTURE',
+    'HEALTH',
+    'GIFT',
+    'CLOTHES',
+    'TRANSPORT',
+    'EDUCATION',
+    'OTHER']
 
 function sortTypes(amount, date) {
     if (amount === null && date === null)
@@ -125,8 +205,6 @@ function onChangeSecondDate(){
 
 function getExpensesPage(page, pageSize) {
 
-    //TODO BUG DACA FACI DE PE O PAGINA MAI MARE DECAT MAXIMUL!!!
-
     if (page == 1)
         pageNum++
     else if (page == -1)
@@ -137,8 +215,7 @@ function getExpensesPage(page, pageSize) {
     else
         globalPageSize = pageSize
 
-    if (pageNum < 0)
-        pageNum = 0
+
 
     let maxPage
     if (globalExpensesLength != null)
@@ -147,6 +224,9 @@ function getExpensesPage(page, pageSize) {
     if (maxPage != null)
         if (pageNum >= maxPage)
             pageNum = maxPage - 1;
+
+      if (pageNum < 0)
+            pageNum = 0
 
     console.log("Global = " + globalPageSize + " Local = " + pageSize)
 
@@ -181,6 +261,12 @@ function getExpensesPage(page, pageSize) {
 
             document.querySelector("#expensesSize").textContent = "Showing " + (pageSize * pageNum + 1) + " to " + secondEntity + " of " + allExpenses.size + " of entries"
             table.innerHTML = '';
+            if(allExpenses.size === 0){
+                document.querySelector("#expensesSize").textContent = ""
+                 table.insertAdjacentHTML("beforeend",
+                                    `<tr><td>No data...</td></tr>`)
+            }
+            else
             for (let i of allExpenses.expenses) {
                 table.insertAdjacentHTML("beforeend",
                     `<tr>   
@@ -216,7 +302,7 @@ function getExpensesPage(page, pageSize) {
 
 function createUser() {
     let name = document.getElementById("createUsername").value;
-    let password = document.getElementById("createPassword").value;
+    let password = document.getElementById("passwordInput").value;
     let email = document.getElementById("createEmail").value;
     console.log(name + " " + password)
 
@@ -419,7 +505,7 @@ function addExpenseToDeleteList(expense){
 }
 
 function getLastSevenDays() {
-    fetch('/api/lastWeekTotalPerDays',
+    fetch('/api/users/statistics/lastWeekTotalPerDays',
         {
             method: 'GET',
         })
@@ -432,8 +518,9 @@ function getLastSevenDays() {
             console.error('Error:', error);
         });
 }
+
 function getLastSixMonths(){
-    fetch('/api/lastMonthsTotalPerMonth',
+    fetch('/api/users/statistics/lastMonthsTotalPerMonthByCategory/6',
         {
             method: 'GET',
         })
@@ -446,6 +533,48 @@ function getLastSixMonths(){
             console.error('Error:', error);
         });
 }
+
+function getTotalSpent(){
+    fetch('/api/users/statistics/totalSpent',
+        {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("totalSpentText").innerHTML = data.total
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+function getDayAverage(){
+    fetch('/api/users/statistics/dayAverage',
+        {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("dayAverageText").innerHTML = data.average
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+function getMonthAverage(){
+    fetch('/api/users/statistics/monthAverage',
+        {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("monthAverageText").innerHTML =data.average
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
+
 function deleteExpenses(){
     Swal.fire({
         title: 'Are you sure?',
@@ -532,8 +661,7 @@ function applyFilters(){
 
 function sendResetPasswordLink() {
 
-    let message = document.getElementById("linkSend")
-    let username = document.getElementById("usernameField").value
+    let email = document.getElementById("usernameField").value
 
     fetch('/api/passwordResetSendLink', {
         method: 'POST',
@@ -542,14 +670,15 @@ function sendResetPasswordLink() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            'username': username
+            'email': email
         })
     }).then(response => {
-        if (response.status === 200)
-            message.textContent = "Link send to email!";
+        if (response.status === 200) {
+            updateInfoAlert("Email sent!",'success','Success!')
+        }
         else {
             response.json().then(data =>
-                message.textContent = data.message
+                updateInfoAlert(data.message)
             )
         }
     }).catch((error) => {
@@ -559,13 +688,44 @@ function sendResetPasswordLink() {
 
 document.addEventListener("DOMContentLoaded", function (event) {
 
+    if(document.body.classList.contains("resetPasswordFrom")){
+        document.querySelector("#newPassword-form").onsubmit = function () {
+            resetPassword()
+            return false
+        }
+    }
+
+    if(document.body.classList.contains("passwordReset")){
+        document.querySelector("#resetPassword-form").onsubmit = function () {
+            sendResetPasswordLink()
+            return false
+        }
+    }
+
     if (document.body.classList.contains("login")) {
         document.querySelector("#login-form").onsubmit = function () {
             login()
             return false
         }
     }
+    if(document.body.classList.contains("createUser")){
+        document.querySelector("#createAccountForm").onsubmit = function () {
+            if(passwordMatch)
+                createUser()
+
+            return false
+        }
+    }
     if (document.body.classList.contains("user")) {
+
+        document.getElementById("amountFilter").style.display = "block";
+        document.getElementById("amountMinFilter").style.display = "none";
+        document.getElementById("amountMaxFilter").style.display = "none";
+
+        document.getElementById("dateFilter").style.display = "block";
+        document.getElementById("firstDateFilter").style.display = "none";
+        document.getElementById("secondDateFilter").style.display = "none";
+
         document.querySelectorAll(".btn-toggle-panel").forEach(function (el) {
             el.onclick = function (e) {
                 e.preventDefault()
@@ -581,17 +741,27 @@ document.addEventListener("DOMContentLoaded", function (event) {
         })
 
         getExpensesPage(0, 20)
+        getDayAverage()
+        getMonthAverage()
+        getTotalSpent()
+
+        document.querySelector("#logout").onclick = function(){
+            logout()
+        }
 
         document.querySelector("#updateUsernameForm").onsubmit = function () {
-            changeUsername('username')
+            if(usernameMatch)
+                changeUserInfo('username')
             return false
         }
         document.querySelector("#updateEmailForm").onsubmit = function () {
-            changeUsername('email')
+            if(emailMatch)
+                changeUserInfo('email')
             return false
         }
         document.querySelector("#updatePasswordForm").onsubmit = function () {
-            changeUsername('password')
+            if(passwordMatch)
+                changeUserInfo('password')
             return false
         }
         document.querySelector("#expenseForm").onsubmit = function () {
@@ -740,23 +910,68 @@ function updateInfoAlert(message, type = 'error', title = 'Error') {
     })
 }
 
-function changeUsername(inputType) {
+function setMatchText(match, message, textMessageId){
+    if (match && message !== '') {
+        document.getElementById(textMessageId).style.color = 'green';
+        document.getElementById(textMessageId).innerHTML = message + ' match!';
+    } else if(!match && message !== ''){
+      document.getElementById(textMessageId).style.color = 'red';
+      document.getElementById(textMessageId).innerHTML = message + ' doens\'t match!';
+    }else{
+        document.getElementById(textMessageId).innerHTML = '';
+    }
+}
+
+function matchChecking(firstId, secondId, textMessageId) {
+
+    let match = document.getElementById(firstId).value === document.getElementById(secondId).value
+    let currentForm
+
+    if(firstId === 'userInput'){
+        usernameMatch = match
+        currentForm = 'Usernames'
+    }
+    else if(firstId === 'emailInput'){
+        emailMatch = match
+        currentForm = 'Emails'
+    }
+    else if(firstId === 'passwordInput'){
+        passwordMatch = match
+        currentForm = 'Passwords'
+    }
+   
+    if(document.getElementById(firstId).value === '' || document.getElementById(secondId).value === ''){
+        setMatchText(match, '', textMessageId)
+    } else {
+        setMatchText(match, currentForm, textMessageId)
+    } 
+}
+
+function changeUserInfo(inputType) {
     let username = document.querySelector("#userInput").value
     let email = document.querySelector("#emailInput").value
-    let password = document.querySelector("#passwordInput").value
+    let newPassword = document.querySelector("#passwordInput").value
 
     if (username == null) return;
-
+    let cleanForm
     let data = {}
-    if (inputType === "username")
+    if (inputType === "username"){
         data.username = username
-    else if (inputType === "email")
+        data.password = document.querySelector("#passwordInputUsername").value
+        cleanForm = cleanUsernameForm
+    }
+    else if (inputType === "email"){
         data.email = email
-    else if (inputType === "password")
-        data.password = password
+        data.password = document.querySelector("#passwordInputEmail").value
+        cleanForm = cleanEmailForm
+    }
+    else if (inputType === "password"){
+        data.newPassword = newPassword
+        data.password = document.querySelector("#oldPasswordInput").value
+        cleanForm = cleanPasswordForm
+    }
 
-
-    fetch('/api/users',
+    fetch('/api/users/updateInfo',
         {
             method: 'PUT',
             headers: {
@@ -766,7 +981,10 @@ function changeUsername(inputType) {
             body: JSON.stringify(data),
         }).then(response => {
         if (response.status === 200) {
-            updateInfoAlert("Username updated successfully")
+            updateInfoAlert('User information updated!', 'success', 'Success!')
+            cleanForm()
+            if (inputType === "username")
+                logoutUser();
         } else {
             response.json().then(data => {
                 updateInfoAlert(data.message)
@@ -775,6 +993,25 @@ function changeUsername(inputType) {
     }).catch((error) => {
         console.error('Error:', error)
     });
+}
+
+function cleanUsernameForm(){
+    document.getElementById("userInput").value = ""
+    document.getElementById("confirmUserInput").value = ""
+    document.getElementById("passwordInputUsername").value = ""
+    document.getElementById("usernameWordMessage").innerHTML = ""
+}
+function cleanEmailForm(){
+    document.getElementById("emailInput").value = ""
+    document.getElementById("confirmEmailInput").value = ""
+    document.getElementById("passwordInputEmail").value = ""
+    document.getElementById("emailWordMessage").innerHTML = ""
+}
+function cleanPasswordForm(){
+    document.getElementById("passwordInput").value = ""
+    document.getElementById("confirmPasswordInput").value = ""
+    document.getElementById("oldPasswordInput").value = ""
+    document.getElementById("passWordMessage").innerHTML = ""
 }
 
 function showChart() {
@@ -794,15 +1031,7 @@ function showChart() {
                 data: totals,
                 fill: false,
                 borderColor: 'rgb(0, 0, 0)',
-                backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)',
-                    'rgb(46, 204, 113)',
-                    'rgb(234, 32, 39)',
-                    'rgb(153, 128, 250)',
-                    'rgb(255, 165, 2)'
-                ],
+                backgroundColor: colorPalette,
                 tension: 0.25
             }]
         },
@@ -811,42 +1040,99 @@ function showChart() {
                 legend: {
                     display: false
                 }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks:{
+                        color:"#FFFFFF"
+                    },
+                    grid: {
+                        color: "#ffffff"
+                    }
+                },
+                y: {
+                    stacked: true,
+                    ticks:{
+                        color:"#FFFFFF"
+                    },
+                    grid: {
+                        color: "#ffffff"
+                    }
+                }
             }
         }
     });
 }
 
+let myChart
+let colorPalette = [
+    'rgb(255, 99, 132)',
+    'rgb(54, 162, 235)',
+    'rgb(255, 205, 86)',
+    'rgb(46, 204, 113)',
+    'rgb(234, 32, 39)',
+    'rgb(153, 128, 250)',
+    'rgb(255, 165, 2)'
+]
+let currentColor = Math.floor(Math.random() * (colorPalette.length-1))
+function getColor(){
+    currentColor++
+    if(currentColor > colorPalette.length-1)
+        currentColor = 0
+    return colorPalette[currentColor]
+}
+
+function addLine(label, lineData){
+    myChart.data.datasets.push({
+        label : label,
+        data: lineData,
+        backgroundColor: getColor(),
+        fontColor: 'rgb(255, 255, 255)',
+        fill: false
+    })
+    myChart.update()
+}
+
 function showMonthCart(){
     let ctx = document.getElementById('last6M').getContext('2d');
-    let myChart = new Chart(ctx, {
+    myChart = new Chart(ctx, {
         title: "Last 6 months",
         type: 'bar',
         data: {
-            labels: lastSixMonths.map(element => element.month + "-" + element.year),
-            datasets: [{
-                data: lastSixMonths.map(x => x.total),
-                fill: false,
-                borderColor: 'rgb(0, 0, 0)',
-                backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)',
-                    'rgb(46, 204, 113)',
-                    'rgb(234, 32, 39)',
-                    'rgb(153, 128, 250)',
-                    'rgb(255, 165, 2)'
-
-                ],
-                hoverOffset: 4
-            }]
-        },options: {
+            labels: lastSixMonths.map(element =>element.month + "-" + element.year),
+        },
+        options: {
             plugins: {
                 legend: {
                     display: false
                 }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks:{
+                        color:"#FFFFFF"
+                    },
+                    grid: {
+                        color: "#ffffff"
+                    }
+                },
+                y: {
+                    stacked: true,
+                    ticks:{
+                        color:"#FFFFFF"
+                    },
+                    grid: {
+                        color: "#ffffff"
+                    }
+                }
             }
         }
     });
+
+    categoriesList.forEach(cat =>
+        addLine(cat,lastSixMonths.map(x => x.categories[cat])))
 }
 
 function capitalizeFirstLetter(string) {
