@@ -7,7 +7,7 @@ which you create an account and add your expenses.
 The application has a frontend and a backend, it can be used at the same time
 as a website or as an api.
 
-##Frontend
+## Frontend
 
 First, we need to create an account, after that we have to verify it via email.
 
@@ -17,12 +17,12 @@ After finishing the account verification, we get into our account.
 
 <img src="./screenshots/ss1.png">
 
-The first page is the expense page where we can see the expenses. We can add, edit
+The first page is the expense page where we can see the expenses. We can also add, edit
 or delete an expense.
 
 <img src="./screenshots/ss4.png">
-
-The application also has a statistics page and a user info page.
+S
+The application also has a statistics page and an user info page.
 
 ## Backend/API Documentation
 
