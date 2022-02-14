@@ -63,10 +63,11 @@ Request Header:
  "details":"Details"
 }
 ```
-
 ## Screenshots  
 
 Login page  
-Expenses page  
-Statistics page  
+<img src="./screenshots/ss1.png" width="600">
+Expenses page
+<img src="./screenshots/ss4.png" width="600">
 User info page
+<img src="./screenshots/ss5.png" width="600">
