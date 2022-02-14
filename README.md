@@ -7,7 +7,7 @@ which you create an account and add your expenses.
 The application has a frontend and a backend, it can be used at the same time
 as a website or as an api.
 
-##Frontend:
+##Frontend
 
 First, we need to create an account, after that we have to verify it via email.
 
