@@ -1,31 +1,33 @@
 # Expenses Manager
 
 ## About
-This project represent a simple "Expense Manager" web application in
+This project represents a simple "Expense Manager" web application in
 which you create an account and add your expenses.
 
 The application has a frontend and a backend, it can be used at the same time
-as a website or an api.
+as a website or as an api.
 
-##Website part:
+##Frontend:
+
 First, we need to create an account, after that we have to verify it via email.
 
 <img src="./screenshots/ss2.png">
 
-After we finish the account verification, we get into ours account.
+After finishing the account verification, we get into our account.
 
 <img src="./screenshots/ss1.png">
 
-The first page is the expense page where we can see you expenses. We can add, edit
+The first page is the expense page where we can see the expenses. We can add, edit
 or delete an expense.
 
 <img src="./screenshots/ss4.png">
 
-The application also have a statistics page and a user info page.
+The application also has a statistics page and a user info page.
 
-## API Documentation
+## Backend/API Documentation
 
 ### Create account example:
+
 `# POST /api/createAccount`
 ```
 Request Header:
