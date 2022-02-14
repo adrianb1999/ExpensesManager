@@ -44,8 +44,8 @@ Response Header:
 ### Add expense example
 ` #POST /api/expense`  
 
-`Request Header:`
 ```
+Request Header:
  Content-Type: "application/json"
  
  Authorization: <JWTToken>
@@ -63,7 +63,9 @@ Response Header:
  "details":"Details"
 }
 ```
-##Screenshots
+
+## Screenshots  
+
 Login page  
 Expenses page  
 Statistics page  
