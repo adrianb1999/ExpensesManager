@@ -13,6 +13,7 @@ import com.adrian99.expensesManager.services.VerificationTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +32,15 @@ import static com.adrian99.expensesManager.emailVerification.TokenType.*;
 @Validated
 public class UserController {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final ExpenseService expenseService;
     private final VerificationTokenService verificationTokenService;
     private final EmailSender emailSender;
     private final ExpenseCustomRepositoryImpl expenseCustomRepository;//delete later
 
-    public UserController(UserService userService, ExpenseService expenseService, VerificationTokenService verificationTokenService, EmailSender emailSender, ExpenseCustomRepositoryImpl expenseCustomRepository) {
+    public UserController(PasswordEncoder passwordEncoder, UserService userService, ExpenseService expenseService, VerificationTokenService verificationTokenService, EmailSender emailSender, ExpenseCustomRepositoryImpl expenseCustomRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.expenseService = expenseService;
         this.verificationTokenService = verificationTokenService;
@@ -89,7 +92,7 @@ public class UserController {
 
         User newUser = new User();
         newUser.setUsername(user.getUsername());
-        newUser.setPassword(user.getPassword());
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setEmail(user.getEmail());
         newUser.setRoles("ROLE_USER");
         newUser.setActive(false);
@@ -171,7 +174,7 @@ public class UserController {
     @DeleteMapping("/api/users/expenses/{expenseId}")
     public void deleteUserExpense(@PathVariable Long expenseId, Principal principal) {
         Long userId = userService.findByUsername(principal.getName()).getId();
-        //TODO Or I can verify that here
+
         expenseService.deleteByIdAndUserId(userId, expenseId);
     }
 
@@ -196,16 +199,13 @@ public class UserController {
             throw new ApiRequestException("Password is required!");
 
         User updateUser = userService.findByUsername(principal.getName());
-        if(updateUser == null)
-            throw new ApiRequestException("Hmm");
-        if(!Objects.equals(userInfo.get("password"), updateUser.getPassword()))
+
+        if(!passwordEncoder.matches(userInfo.get("password"), updateUser.getPassword()))
             throw new ApiRequestException("Password incorrect");
 
         if (userInfo.get("email") != null) {
             if (userInfo.get("email").isEmpty())
                 throw new ApiRequestException("Email cannot be null!");
-
-            // TODO EMAIL VALIDATION!
 
             if (Objects.equals(updateUser.getEmail(), userInfo.get("email"))) {
                 throw new ApiRequestException("The email cannot be the same!");
@@ -236,7 +236,7 @@ public class UserController {
             if(Objects.equals(updateUser.getPassword(), userInfo.get("newPassword")))
                 throw new ApiRequestException("The password cannot be the same!");
 
-            updateUser.setPassword(userInfo.get("newPassword"));
+            updateUser.setPassword(passwordEncoder.encode(userInfo.get("newPassword")));
         }
 
         return userService.save(updateUser);
@@ -289,7 +289,7 @@ public class UserController {
         if (!Objects.equals(currentUser.getPassword(), passwordBody.get("oldPassword")))
             throw new ApiRequestException("Password is wrong!");
 
-        currentUser.setPassword(passwordBody.get("newPassword"));
+        currentUser.setPassword(passwordEncoder.encode(passwordBody.get("newPassword")));
         userService.save(currentUser);
 
         return new ResponseEntity<>("{\"message\":\"Password updated successfully!\"}", HttpStatus.OK);
