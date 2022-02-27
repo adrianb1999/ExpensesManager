@@ -175,10 +175,6 @@ body {
     height: 40px;
 }
 
-/*#expensesTable tr:nth-child(even) {*/
-/*    background-color: #bdc3c7;*/
-/*}*/
-
 #expensesTable thead th {
     height: 50px;
     margin: auto;
@@ -630,7 +626,6 @@ label {
 #currentPage {
     text-align: center;
     font-weight: bold;
-    color: white;
     font-size: 15px;
 }
 

@@ -19,7 +19,7 @@ public class ViewController {
 
     @RequestMapping(value = {"/index.html", "/", "/index"})
     public String index() {
-        return "index";
+        return "login";
     }
 
     @RequestMapping("/login.html")

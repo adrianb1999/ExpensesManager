@@ -1,5 +1,4 @@
-function escapeHtml(unsafe)
-{
+function escapeHtml(unsafe) {
     return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -20,28 +19,26 @@ function login() {
         })
         .then(response => {
 
-            console.log(...response.headers);
-
             if (response.status === 200)
                 window.location.href = "user.html"
             else if (response.status === 400) {
                 response.json().then(data =>
-                    loginAlert(data.message)
+                    showAlert(data.message)
                 )
 
             } else if (response.status === 404) {
-                loginAlert("Cannot connect to the server!")
+                showAlert("Cannot connect to the server!")
             }
         })
         .catch((error) => {
-            loginAlert("Cannot connect to the server!")
+            showAlert("Cannot connect to the server!")
             console.error('Error:', error);
         });
 }
 
-function amountSwitch(){
+function amountSwitch() {
     let switchValue = document.getElementById("amountCategories")
-    if(switchValue.value === "fixed"){
+    if (switchValue.value === "fixed") {
         document.getElementById("amountFilter").style.display = "block";
         document.getElementById("amountMinFilter").style.display = "none";
         document.getElementById("amountMaxFilter").style.display = "none";
@@ -49,8 +46,7 @@ function amountSwitch(){
         document.getElementById("amountMinFilter").value = "";
         document.getElementById("amountMaxFilter").value = "";
 
-    }
-    else{
+    } else {
         document.getElementById("amountFilter").style.display = "none";
         document.getElementById("amountMinFilter").style.display = "block";
         document.getElementById("amountMaxFilter").style.display = "block";
@@ -59,17 +55,16 @@ function amountSwitch(){
     }
 }
 
-function dateSwitch(){
+function dateSwitch() {
     let switchValue = document.getElementById("dateCategories")
-    if(switchValue.value === "fixed"){
+    if (switchValue.value === "fixed") {
         document.getElementById("dateFilter").style.display = "block";
         document.getElementById("firstDateFilter").style.display = "none";
         document.getElementById("secondDateFilter").style.display = "none";
 
         document.getElementById("firstDateFilter").value = "";
         document.getElementById("secondDateFilter").value = "";
-    }
-    else{
+    } else {
         document.getElementById("dateFilter").style.display = "none";
         document.getElementById("firstDateFilter").style.display = "block";
         document.getElementById("secondDateFilter").style.display = "block";
@@ -78,7 +73,7 @@ function dateSwitch(){
     }
 }
 
-function logout(){
+function logout() {
     Swal.fire({
         title: 'Wait!',
         text: "Are you sure?",
@@ -87,26 +82,26 @@ function logout(){
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, logout!'
-      }).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
             logoutUser()
         }
-      })
+    })
 }
 
-function logoutUser(){
+function logoutUser() {
     deleteAllCookies()
     window.location.href = "login.html"
 }
 
 //stolen
 function deleteAllCookies() {
-    var cookies = document.cookie.split(";");
+    let cookies = document.cookie.split(";");
 
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i];
-        var eqPos = cookie.indexOf("=");
-        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        let eqPos = cookie.indexOf("=");
+        let name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
 }
@@ -142,6 +137,17 @@ var passwordMatch = false
 var usernameMatch = false
 var emailMatch = false
 
+let myChart
+let colorPalette = [
+    'rgb(255, 99, 132)',
+    'rgb(54, 162, 235)',
+    'rgb(255, 205, 86)',
+    'rgb(46, 204, 113)',
+    'rgb(234, 32, 39)',
+    'rgb(153, 128, 250)',
+    'rgb(255, 165, 2)'
+]
+
 let categoriesList = ['FUEL',
     'FOOD',
     'DRINKS',
@@ -173,48 +179,41 @@ function sortCategory(amount, date) {
         return 'DATE'
 }
 
-function onChangeAmount(){
-    var inputMin = document.getElementById("amountFilter")
-    amount = inputMin.value
+function onChangeAmount() {
+    amount =  document.getElementById("amountFilter").value
 }
 
-function onChangeMinAmount(){
-    var inputMin = document.getElementById("amountMinFilter")
-    minAmount = inputMin.value
-    console.log("ON-CHANGE-MIN-AMOUNT")
-}
-function onChangeMaxAmount(){
-    var inputMax = document.getElementById("amountMaxFilter")
-    maxAmount = inputMax.value
+function onChangeMinAmount() {
+    minAmount = document.getElementById("amountMinFilter").value
 }
 
-function onChangeDate(){
-    var inputMin = document.getElementById("dateFilter")
-    date = inputMin.value
+function onChangeMaxAmount() {
+    maxAmount = document.getElementById("amountMaxFilter").value
 }
 
-function onChangeFirstDate(){
-    var inputMin = document.getElementById("firstDateFilter")
-    firstDate = inputMin.value
-    console.log("ON-CHANGE-MIN-AMOUNT")
+function onChangeDate() {
+    date = document.getElementById("dateFilter").value
 }
-function onChangeSecondDate(){
-    var inputMax = document.getElementById("secondDateFilter")
-    secondDate = inputMax.value
+
+function onChangeFirstDate() {
+    firstDate = document.getElementById("firstDateFilter").value
+}
+
+function onChangeSecondDate() {
+    secondDate = document.getElementById("secondDateFilter").value
 }
 
 function getExpensesPage(page, pageSize) {
 
-    if (page == 1)
+    if (page === 1)
         pageNum++
-    else if (page == -1)
+    else if (page === -1)
         pageNum--
 
     if (pageSize == null)
         pageSize = globalPageSize
     else
         globalPageSize = pageSize
-
 
 
     let maxPage
@@ -225,13 +224,11 @@ function getExpensesPage(page, pageSize) {
         if (pageNum >= maxPage)
             pageNum = maxPage - 1;
 
-      if (pageNum < 0)
-            pageNum = 0
-
-    console.log("Global = " + globalPageSize + " Local = " + pageSize)
+    if (pageNum < 0)
+        pageNum = 0
 
     let payMeth = []
-    if(payMethodList.length !== 2)
+    if (payMethodList.length !== 2)
         payMeth = payMethodList
 
     fetch('/api/users/expenses?' + new URLSearchParams({
@@ -241,12 +238,12 @@ function getExpensesPage(page, pageSize) {
         sortType: sortTypes(amountSortType, dateSortType),
         category: categoryList,
         payMethod: payMeth,
-        amountGreaterThan: minAmount ? minAmount : "" ,
+        amountGreaterThan: minAmount ? minAmount : "",
         amountLessThan: maxAmount ? maxAmount : "",
         amount: amount ? amount : "",
-        date : date ? date : "",
-        dateAfter : firstDate ? firstDate : "",
-        dateBefore : secondDate ? secondDate : "",
+        date: date ? date : "",
+        dateAfter: firstDate ? firstDate : "",
+        dateBefore: secondDate ? secondDate : "",
     }),
         {
             method: 'GET',
@@ -261,15 +258,14 @@ function getExpensesPage(page, pageSize) {
 
             document.querySelector("#expensesSize").textContent = "Showing " + (pageSize * pageNum + 1) + " to " + secondEntity + " of " + allExpenses.size + " of entries"
             table.innerHTML = '';
-            if(allExpenses.size === 0){
+            if (allExpenses.size === 0) {
                 document.querySelector("#expensesSize").textContent = ""
-                 table.insertAdjacentHTML("beforeend",
-                                    `<tr><td>No data...</td></tr>`)
-            }
-            else
-            for (let i of allExpenses.expenses) {
                 table.insertAdjacentHTML("beforeend",
-                    `<tr>   
+                    `<tr><td>No data...</td></tr>`)
+            } else
+                for (let i of allExpenses.expenses) {
+                    table.insertAdjacentHTML("beforeend",
+                        `<tr>   
                                             <td><input type="checkbox" class="checkboxExpense" onclick="addExpenseToDeleteList('${i.id}')" value="${i.id}"></td>
                                             <td>${escapeHtml(i.date)}</td>
                                             <td>${escapeHtml(i.title)}</td>                        
@@ -290,7 +286,7 @@ function getExpensesPage(page, pageSize) {
                                                 </button>
                                             </td>
                                         </tr>`)
-            }
+                }
             document.getElementById("currentPage").textContent = (pageNum + 1);
             getLastSevenDays()
             getLastSixMonths()
@@ -304,7 +300,6 @@ function createUser() {
     let name = document.getElementById("createUsername").value;
     let password = document.getElementById("passwordInput").value;
     let email = document.getElementById("createEmail").value;
-    console.log(name + " " + password)
 
     fetch('/api/createUser',
         {
@@ -337,8 +332,6 @@ function postExpense() {
     let details = document.getElementById("details").value
     let date = document.getElementById("date").value
 
-    console.log(title + " " + category + " " + payMethod + " " + amount + " " + details + " " + date)
-
     fetch('/api/users/expenses',
         {
             method: 'POST',
@@ -356,16 +349,13 @@ function postExpense() {
             }),
         }).then(response => {
         if (response.status === 200) {
-            updateInfoAlert('Expense has been added', 'success', 'Success!')
+            showAlert('Expense has been added', 'success', 'Success!')
             getExpensesPage(0, 20)
             closeModal()
-
-            //Reset form
             resetForm()
-
         } else {
             response.json().then(data => {
-                updateInfoAlert(data.message, 'error', 'Something is wrong!')
+                showAlert(data.message, 'error', 'Something is wrong!')
             })
         }
     })
@@ -381,8 +371,6 @@ function putExpense() {
     let amount = document.getElementById("amount").value
     let details = document.getElementById("details").value
     let date = document.getElementById("date").value
-
-    console.log(title + " " + category + " " + payMethod + " " + amount + " " + details + " " + date)
 
     fetch(`/api/users/expenses/${currentExpenseId}`,
         {
@@ -401,15 +389,13 @@ function putExpense() {
             }),
         }).then(response => {
         if (response.status === 200) {
-            updateInfoAlert('Expense has been edited', 'success', 'Success!')
+            showAlert('Expense has been edited', 'success', 'Success!')
             getExpensesPage(0, 20)
             closeModal()
-
             resetForm()
-
         } else {
             response.json().then(data => {
-                updateInfoAlert(data.message, 'error', 'Something is wrong!')
+                showAlert(data.message, 'error', 'Something is wrong!')
             })
         }
     })
@@ -419,20 +405,16 @@ function putExpense() {
 }
 
 function deleteExpenseList() {
-    fetch(`/api/users/expenses?`+ new URLSearchParams({
-            expenseIds:  deleteList
-        }),
+    fetch(`/api/users/expenses?` + new URLSearchParams({
+        expenseIds: deleteList
+    }),
         {
             method: 'DELETE',
             headers: {},
         }).then(response => {
         if (response.status === 200) {
-            Swal.fire(
-                'All deleted!',
-                'The expenses has been deleted.',
-                'success'
-            )
-            deleteList.splice(0,(deleteList.length))
+            showAlert('The expenses has been deleted.', 'success', 'All deleted!')
+            deleteList.splice(0, (deleteList.length))
             checkType = true
             getExpensesPage(0, 20)
         }
@@ -442,17 +424,17 @@ function deleteExpenseList() {
         });
 }
 
-function addPayMethodToList(payMethod){
+function addPayMethodToList(payMethod) {
 
-    if(payMethodList.length === 0){
+    if (payMethodList.length === 0) {
         payMethodList.push(payMethod)
         document.getElementById(payMethod).value = "check"
         return
     }
 
-    for(let i = 0; i < payMethodList.length; i++){
-        if(payMethodList[i] === payMethod){
-            payMethodList.splice(i,1)
+    for (let i = 0; i < payMethodList.length; i++) {
+        if (payMethodList[i] === payMethod) {
+            payMethodList.splice(i, 1)
             document.getElementById(payMethod).value = ""
             return
         }
@@ -461,16 +443,16 @@ function addPayMethodToList(payMethod){
     document.getElementById(payMethod).value = "check"
 }
 
-function addCategoryToList(category){
+function addCategoryToList(category) {
 
-    if(categoryList.length === 0){
+    if (categoryList.length === 0) {
         categoryList.push(category)
         document.getElementById(category).value = "check"
         return
     }
-    for(let i = 0; i < categoryList.length; i++){
-        if(categoryList[i] === category){
-            categoryList.splice(i,1)
+    for (let i = 0; i < categoryList.length; i++) {
+        if (categoryList[i] === category) {
+            categoryList.splice(i, 1)
             document.getElementById(category).value = ""
             return
         }
@@ -479,29 +461,25 @@ function addCategoryToList(category){
     document.getElementById(category).value = "check"
 }
 
-function addExpenseToDeleteList(expense){
-
+function addExpenseToDeleteList(expense) {
     let counter = 0
-    if(deleteList.length === 0) {
+
+    if (deleteList.length === 0) {
         deleteList.push(expense)
         document.getElementById("deleteSelectedExpenses").disabled = false
         return
     }
-    for(let i = 0; i < deleteList.length; i++) {
-        if(deleteList[i] === expense) {
-            deleteList.splice(i,1)
+    for (let i = 0; i < deleteList.length; i++) {
+        if (deleteList[i] === expense) {
+            deleteList.splice(i, 1)
             counter++
         }
     }
-    if(counter === 0) {
+    if (counter === 0) {
         deleteList.push(expense)
         document.getElementById("deleteSelectedExpenses").disabled = false
     }
-    if(deleteList.length === 0){
-        document.getElementById("deleteSelectedExpenses").disabled = true
-    }else{
-        document.getElementById("deleteSelectedExpenses").disabled = false
-    }
+    document.getElementById("deleteSelectedExpenses").disabled = deleteList.length === 0;
 }
 
 function getLastSevenDays() {
@@ -519,7 +497,7 @@ function getLastSevenDays() {
         });
 }
 
-function getLastSixMonths(){
+function getLastSixMonths() {
     fetch('/api/users/statistics/lastMonthsTotalPerMonthByCategory/6',
         {
             method: 'GET',
@@ -534,7 +512,7 @@ function getLastSixMonths(){
         });
 }
 
-function getTotalSpent(){
+function getTotalSpent() {
     fetch('/api/users/statistics/totalSpent',
         {
             method: 'GET',
@@ -547,7 +525,8 @@ function getTotalSpent(){
             console.error('Error:', error);
         });
 }
-function getDayAverage(){
+
+function getDayAverage() {
     fetch('/api/users/statistics/dayAverage',
         {
             method: 'GET',
@@ -560,22 +539,22 @@ function getDayAverage(){
             console.error('Error:', error);
         });
 }
-function getMonthAverage(){
+
+function getMonthAverage() {
     fetch('/api/users/statistics/monthAverage',
         {
             method: 'GET',
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById("monthAverageText").innerHTML =data.average
+            document.getElementById("monthAverageText").innerHTML = data.average
         })
         .catch((error) => {
             console.error('Error:', error);
         });
 }
 
-
-function deleteExpenses(){
+function deleteExpenses() {
     Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -614,11 +593,7 @@ function delExpense(expenseId) {
             headers: {},
         }).then(response => {
         if (response.status === 200) {
-            Swal.fire(
-                'Deleted!',
-                'The expense has been deleted.',
-                'success'
-            )
+            showAlert('The expense has been deleted.', 'success', 'Deleted!')
             getExpensesPage(0, 20)
         }
     })
@@ -632,9 +607,6 @@ function resetPassword() {
     const confirmToken = urlParams.get('token')
 
     let password = document.getElementById("passwordReset").value
-
-    console.log(confirmToken)
-    console.log(password)
 
     fetch(`/api/passwordReset?token=${confirmToken}`, {
         method: 'POST',
@@ -653,14 +625,13 @@ function resetPassword() {
     });
 }
 
-function applyFilters(){
+function applyFilters() {
     pageNum = 0
-    getExpensesPage(0,20)
+    getExpensesPage(0, 20)
     document.getElementById("filterModal").style.display = "none";
 }
 
 function sendResetPasswordLink() {
-
     let email = document.getElementById("usernameField").value
 
     fetch('/api/passwordResetSendLink', {
@@ -674,11 +645,10 @@ function sendResetPasswordLink() {
         })
     }).then(response => {
         if (response.status === 200) {
-            updateInfoAlert("Email sent!",'success','Success!')
-        }
-        else {
+            showAlert("Email sent!", 'success', 'Success!')
+        } else {
             response.json().then(data =>
-                updateInfoAlert(data.message)
+                showAlert(data.message)
             )
         }
     }).catch((error) => {
@@ -686,16 +656,16 @@ function sendResetPasswordLink() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
 
-    if(document.body.classList.contains("resetPasswordFrom")){
+    if (document.body.classList.contains("resetPasswordFrom")) {
         document.querySelector("#newPassword-form").onsubmit = function () {
             resetPassword()
             return false
         }
     }
 
-    if(document.body.classList.contains("passwordReset")){
+    if (document.body.classList.contains("passwordReset")) {
         document.querySelector("#resetPassword-form").onsubmit = function () {
             sendResetPasswordLink()
             return false
@@ -708,9 +678,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
             return false
         }
     }
-    if(document.body.classList.contains("createUser")){
+    if (document.body.classList.contains("createUser")) {
         document.querySelector("#createAccountForm").onsubmit = function () {
-            if(passwordMatch)
+            if (passwordMatch)
                 createUser()
 
             return false
@@ -745,22 +715,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
         getMonthAverage()
         getTotalSpent()
 
-        document.querySelector("#logout").onclick = function(){
+        document.querySelector("#logout").onclick = function () {
             logout()
         }
 
         document.querySelector("#updateUsernameForm").onsubmit = function () {
-            if(usernameMatch)
+            if (usernameMatch)
                 changeUserInfo('username')
             return false
         }
         document.querySelector("#updateEmailForm").onsubmit = function () {
-            if(emailMatch)
+            if (emailMatch)
                 changeUserInfo('email')
             return false
         }
         document.querySelector("#updatePasswordForm").onsubmit = function () {
-            if(passwordMatch)
+            if (passwordMatch)
                 changeUserInfo('password')
             return false
         }
@@ -776,9 +746,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         var modal = document.getElementById("myModal");
         var filterModal = document.getElementById("filterModal");
 
-        // Get the button that opens the modal
-
-        // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close")[0];
         var span2 = document.getElementsByClassName("close")[1];
 
@@ -786,13 +753,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
             filterModal.style.display = "none";
         }
 
-        // When the user clicks on <span> (x), close the modal
         span.onclick = function () {
             resetForm()
             modal.style.display = "none";
         }
 
-        // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
             if (event.target === modal || event.target === filterModal) {
                 modal.style.display = "none";
@@ -801,7 +766,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
             }
         }
 
-        var amountSorting = document.getElementById("sortAmount")
+        let amountSorting = document.getElementById("sortAmount")
         amountSorting.onclick = function () {
 
             if (amountSortType == null)
@@ -813,7 +778,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
             dateSortType = null
             getExpensesPage(0, 20)
         }
-        var dateSorting = document.getElementById("sortDate")
+        let dateSorting = document.getElementById("sortDate")
         dateSorting.onclick = function () {
             if (dateSortType == null)
                 dateSortType = 'ASC'
@@ -825,19 +790,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
             amountSortType = null
             getExpensesPage(0, 20)
         }
-        var selectingBox = document.getElementById("selectBox")
+        let selectingBox = document.getElementById("selectBox")
         selectingBox.onclick = function () {
 
             checkType = !checkType
 
-            var allBoxes = document.getElementsByClassName("checkboxExpense")
+            let allBoxes = document.getElementsByClassName("checkboxExpense")
             for (i of allBoxes) {
-                if (checkType == false) {
+                if (checkType === false) {
                     if (i.checked === false) {
                         addExpenseToDeleteList(i.value)
                         i.checked = true
                     }
-                } else if (i.checked === true){
+                } else if (i.checked === true) {
                     i.checked = false
                     addExpenseToDeleteList(i.value)
                 }
@@ -846,12 +811,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 });
 
-function openFilterModal(){
+function openFilterModal() {
     document.getElementById("filterModal").style.display = "flex";
 }
-function openExpenseModal(){
+
+function openExpenseModal() {
     document.getElementById("myModal").style.display = "block"
 }
+
 function closeModal() {
     document.getElementById("myModal").style.display = "none"
 }
@@ -873,6 +840,7 @@ function resetForm() {
 }
 
 function editExpense(expenseId) {
+
     for (let i = 0; i < allExpenses.expenses.length; i++)
         if (allExpenses.expenses[i].id === expenseId) {
             document.getElementById("title").value = allExpenses.expenses[i].title
@@ -882,6 +850,7 @@ function editExpense(expenseId) {
             document.getElementById("details").value = allExpenses.expenses[i].details
             document.getElementById("date").value = allExpenses.expenses[i].date
         }
+
     document.getElementById("myModal").style.display = "block";
 
     document.getElementById("addExpenseButton").textContent = "Edit expense"
@@ -892,32 +861,23 @@ function editExpense(expenseId) {
     currentExpenseId = expenseId
 }
 
-function loginAlert(message) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Login error',
-        text: message,
-        timer: 2000,
-    })
-}
-
-function updateInfoAlert(message, type = 'error', title = 'Error') {
+function showAlert(message, type = 'error', title = 'Error', timer = 2000) {
     Swal.fire({
         icon: type,
         title: title,
         text: message,
-        timer: 2000,
+        timer: timer,
     })
 }
 
-function setMatchText(match, message, textMessageId){
+function setMatchText(match, message, textMessageId) {
     if (match && message !== '') {
         document.getElementById(textMessageId).style.color = 'green';
         document.getElementById(textMessageId).innerHTML = message + ' match!';
-    } else if(!match && message !== ''){
-      document.getElementById(textMessageId).style.color = 'red';
-      document.getElementById(textMessageId).innerHTML = message + ' doens\'t match!';
-    }else{
+    } else if (!match && message !== '') {
+        document.getElementById(textMessageId).style.color = 'red';
+        document.getElementById(textMessageId).innerHTML = message + ' doens\'t match!';
+    } else {
         document.getElementById(textMessageId).innerHTML = '';
     }
 }
@@ -927,24 +887,22 @@ function matchChecking(firstId, secondId, textMessageId) {
     let match = document.getElementById(firstId).value === document.getElementById(secondId).value
     let currentForm
 
-    if(firstId === 'userInput'){
+    if (firstId === 'userInput') {
         usernameMatch = match
         currentForm = 'Usernames'
-    }
-    else if(firstId === 'emailInput'){
+    } else if (firstId === 'emailInput') {
         emailMatch = match
         currentForm = 'Emails'
-    }
-    else if(firstId === 'passwordInput'){
+    } else if (firstId === 'passwordInput') {
         passwordMatch = match
         currentForm = 'Passwords'
     }
-   
-    if(document.getElementById(firstId).value === '' || document.getElementById(secondId).value === ''){
+
+    if (document.getElementById(firstId).value === '' || document.getElementById(secondId).value === '') {
         setMatchText(match, '', textMessageId)
     } else {
         setMatchText(match, currentForm, textMessageId)
-    } 
+    }
 }
 
 function changeUserInfo(inputType) {
@@ -955,17 +913,15 @@ function changeUserInfo(inputType) {
     if (username == null) return;
     let cleanForm
     let data = {}
-    if (inputType === "username"){
+    if (inputType === "username") {
         data.username = username
         data.password = document.querySelector("#passwordInputUsername").value
         cleanForm = cleanUsernameForm
-    }
-    else if (inputType === "email"){
+    } else if (inputType === "email") {
         data.email = email
         data.password = document.querySelector("#passwordInputEmail").value
         cleanForm = cleanEmailForm
-    }
-    else if (inputType === "password"){
+    } else if (inputType === "password") {
         data.newPassword = newPassword
         data.password = document.querySelector("#oldPasswordInput").value
         cleanForm = cleanPasswordForm
@@ -981,13 +937,13 @@ function changeUserInfo(inputType) {
             body: JSON.stringify(data),
         }).then(response => {
         if (response.status === 200) {
-            updateInfoAlert('User information updated!', 'success', 'Success!')
+            showAlert('User information updated!', 'success', 'Success!')
             cleanForm()
             if (inputType === "username")
                 logoutUser();
         } else {
             response.json().then(data => {
-                updateInfoAlert(data.message)
+                showAlert(data.message)
             })
         }
     }).catch((error) => {
@@ -995,19 +951,21 @@ function changeUserInfo(inputType) {
     });
 }
 
-function cleanUsernameForm(){
+function cleanUsernameForm() {
     document.getElementById("userInput").value = ""
     document.getElementById("confirmUserInput").value = ""
     document.getElementById("passwordInputUsername").value = ""
     document.getElementById("usernameWordMessage").innerHTML = ""
 }
-function cleanEmailForm(){
+
+function cleanEmailForm() {
     document.getElementById("emailInput").value = ""
     document.getElementById("confirmEmailInput").value = ""
     document.getElementById("passwordInputEmail").value = ""
     document.getElementById("emailWordMessage").innerHTML = ""
 }
-function cleanPasswordForm(){
+
+function cleanPasswordForm() {
     document.getElementById("passwordInput").value = ""
     document.getElementById("confirmPasswordInput").value = ""
     document.getElementById("oldPasswordInput").value = ""
@@ -1044,8 +1002,8 @@ function showChart() {
             scales: {
                 x: {
                     stacked: true,
-                    ticks:{
-                        color:"#FFFFFF"
+                    ticks: {
+                        color: "#FFFFFF"
                     },
                     grid: {
                         color: "#ffffff"
@@ -1053,8 +1011,8 @@ function showChart() {
                 },
                 y: {
                     stacked: true,
-                    ticks:{
-                        color:"#FFFFFF"
+                    ticks: {
+                        color: "#FFFFFF"
                     },
                     grid: {
                         color: "#ffffff"
@@ -1065,27 +1023,18 @@ function showChart() {
     });
 }
 
-let myChart
-let colorPalette = [
-    'rgb(255, 99, 132)',
-    'rgb(54, 162, 235)',
-    'rgb(255, 205, 86)',
-    'rgb(46, 204, 113)',
-    'rgb(234, 32, 39)',
-    'rgb(153, 128, 250)',
-    'rgb(255, 165, 2)'
-]
-let currentColor = Math.floor(Math.random() * (colorPalette.length-1))
-function getColor(){
+let currentColor = Math.floor(Math.random() * (colorPalette.length - 1))
+
+function getColor() {
     currentColor++
-    if(currentColor > colorPalette.length-1)
+    if (currentColor > colorPalette.length - 1)
         currentColor = 0
     return colorPalette[currentColor]
 }
 
-function addLine(label, lineData){
+function addLine(label, lineData) {
     myChart.data.datasets.push({
-        label : label,
+        label: label,
         data: lineData,
         backgroundColor: getColor(),
         fontColor: 'rgb(255, 255, 255)',
@@ -1094,13 +1043,13 @@ function addLine(label, lineData){
     myChart.update()
 }
 
-function showMonthCart(){
+function showMonthCart() {
     let ctx = document.getElementById('last6M').getContext('2d');
     myChart = new Chart(ctx, {
         title: "Last 6 months",
         type: 'bar',
         data: {
-            labels: lastSixMonths.map(element =>element.month + "-" + element.year),
+            labels: lastSixMonths.map(element => element.month + "-" + element.year),
         },
         options: {
             plugins: {
@@ -1111,8 +1060,8 @@ function showMonthCart(){
             scales: {
                 x: {
                     stacked: true,
-                    ticks:{
-                        color:"#FFFFFF"
+                    ticks: {
+                        color: "#FFFFFF"
                     },
                     grid: {
                         color: "#ffffff"
@@ -1120,8 +1069,8 @@ function showMonthCart(){
                 },
                 y: {
                     stacked: true,
-                    ticks:{
-                        color:"#FFFFFF"
+                    ticks: {
+                        color: "#FFFFFF"
                     },
                     grid: {
                         color: "#ffffff"
@@ -1132,7 +1081,7 @@ function showMonthCart(){
     });
 
     categoriesList.forEach(cat =>
-        addLine(cat,lastSixMonths.map(x => x.categories[cat])))
+        addLine(cat, lastSixMonths.map(x => x.categories[cat])))
 }
 
 function capitalizeFirstLetter(string) {
