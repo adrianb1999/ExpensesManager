@@ -21,7 +21,7 @@ The first page is the expense page where we can see the expenses. We can also ad
 or delete an expense.
 
 <img src="./screenshots/ss4.png">
-S
+
 The application also has a statistics page and an user info page.
 
 ## Backend/API Documentation
