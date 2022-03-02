@@ -54,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManagerBean(), jwtConfig, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey, applicationUserService), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/api/users/*/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/users/*/*").hasAnyAuthority("ROLE_USER")
                 .antMatchers("/api/createUser", "/api/categories/**","/api/registrationConfirm","/api/passwordReset", "/api/passwordResetSendLink").permitAll()
                 .antMatchers("/index.html","/index","/login.html","/","/createUser.html","/registrationConfirm.html","/passwordResetForm.html","/passwordReset.html").permitAll()
                 .antMatchers("/css/user.css","/js/main.js").permitAll()
