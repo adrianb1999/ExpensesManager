@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class Expense {
@@ -113,5 +114,18 @@ public class Expense {
 
     public void setUsers(User users) {
         this.users = users;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Expense expense = (Expense) o;
+        return Objects.equals(id, expense.id) && Objects.equals(title, expense.title) && category == expense.category && Objects.equals(date, expense.date) && payMethod == expense.payMethod && Objects.equals(amount, expense.amount) && Objects.equals(details, expense.details) && Objects.equals(users, expense.users);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, category, date, payMethod, amount, details, users);
     }
 }

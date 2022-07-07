@@ -95,13 +95,14 @@ public class UserController {
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setEmail(user.getEmail());
         newUser.setRoles("ROLE_USER");
-        newUser.setActive(false);
+        //TODO SET BACK TO FALSE
+        newUser.setActive(true);
 
         userService.save(newUser);
 
         String token = userService.generateToken(newUser);
-
-        emailSender.sendEmail(newUser.getEmail(), token, ACCOUNT_ACTIVATION);
+        //TODO uncomment
+//        emailSender.sendEmail(newUser.getEmail(), token, ACCOUNT_ACTIVATION);
 
         return newUser;
     }
@@ -240,7 +241,6 @@ public class UserController {
         }
 
         return userService.save(updateUser);
-
     }
 
     @DeleteMapping("/api/users/{id}")
