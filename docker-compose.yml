@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      DB_URL : jdbc:postgresql://db:5432/expensesDB
+      DB_USERNAME: postman
+      DB_PASSWORD: admin
+      SECRET_KEY_JWT: mQUm3shQVbNnStdEfePdCj4bDTmAmgJuSAMt3YjjbQhFpVPM
+  db:
+    image: postgres:13.2-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postman
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: expensesDB
