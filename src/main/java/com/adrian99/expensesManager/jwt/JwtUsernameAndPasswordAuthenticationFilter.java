@@ -73,6 +73,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .compact();
 
         response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
-        response.addCookie(new Cookie(jwtConfig.getAuthorizationHeader(), token));
+        Cookie authorizationCookie = new Cookie(jwtConfig.getAuthorizationHeader(), token);
+        authorizationCookie.setMaxAge(24*60);
+        response.addCookie(authorizationCookie);
     }
 }

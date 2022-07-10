@@ -4,12 +4,24 @@ import com.adrian99.expensesManager.customQueries.SortBy;
 import com.adrian99.expensesManager.customQueries.SortTypes;
 import com.adrian99.expensesManager.emailVerification.EmailSender;
 import com.adrian99.expensesManager.emailVerification.VerificationToken;
+import com.adrian99.expensesManager.exception.ApiException;
 import com.adrian99.expensesManager.exception.ApiRequestException;
 import com.adrian99.expensesManager.model.*;
 import com.adrian99.expensesManager.repositories.custom.implementation.ExpenseCustomRepositoryImpl;
 import com.adrian99.expensesManager.services.ExpenseService;
 import com.adrian99.expensesManager.services.UserService;
 import com.adrian99.expensesManager.services.VerificationTokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +44,8 @@ import static com.adrian99.expensesManager.emailVerification.TokenType.*;
 @Validated
 public class UserController {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final ExpenseService expenseService;
@@ -47,6 +61,19 @@ public class UserController {
         this.emailSender = emailSender;
         this.expenseCustomRepository = expenseCustomRepository;
     }
+
+    //Swagger example!
+    @Operation(summary = "Get user expenses.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "Authorization-Token", required = true, in = ParameterIn.HEADER),
+                    @Parameter(name = "Authorization-Cookie", description = "Authorization-Token", required = true, in = ParameterIn.COOKIE)
+
+            },
+            responses = {
+                    @ApiResponse(description = "Get expenses success", responseCode = "200",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
+            })
 
     @GetMapping("/api/users/expenses")
     public Map<String, Object> findUserExpenses(@RequestParam(name = "amount", required = false) Double amount,
@@ -179,29 +206,36 @@ public class UserController {
         expenseService.deleteByIdAndUserId(userId, expenseId);
     }
 
-    @DeleteMapping("/api/users/expenses")
-    public void deleteMultipleExpenses(@RequestParam(name = "expenseIds") Set<Long> idList, Principal principal) {
+    @DeleteMapping(value = "/api/users/expenses", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> deleteMultipleExpenses(@RequestParam(name = "expenseIds") Set<Long> idList, Principal principal) {
         User currentUser = userService.findByUsername(principal.getName());
+
         idList.forEach(aLong -> {
             if (expenseService.findById(aLong) == null) {
                 throw new ApiRequestException("Expense with id " + aLong + " does not exist!");
             }
-            if(expenseService.findById(aLong).getUsers() != currentUser){
+            if (expenseService.findById(aLong).getUsers() != currentUser) {
                 throw new ApiRequestException("You cannot delete another user expense!");
             }
         });
-        expenseService.deleteAllById(idList);
+
+        try {
+            expenseService.deleteAllById(idList);
+            return new ResponseEntity<>("{\"message\":\"Expenses deleted successfully\"", HttpStatus.OK);
+        } catch (Exception e){
+            throw new ApiRequestException("Something went wrong!");
+        }
     }
 
     @PutMapping("/api/users/updateInfo")
     public User saveOrUpdate(@RequestBody Map<String, String> userInfo, Principal principal) {
 
-        if(userInfo.get("password") == null)
+        if (userInfo.get("password") == null)
             throw new ApiRequestException("Password is required!");
 
         User updateUser = userService.findByUsername(principal.getName());
 
-        if(!passwordEncoder.matches(userInfo.get("password"), updateUser.getPassword()))
+        if (!passwordEncoder.matches(userInfo.get("password"), updateUser.getPassword()))
             throw new ApiRequestException("Password incorrect");
 
         if (userInfo.get("email") != null) {
@@ -234,7 +268,7 @@ public class UserController {
         if (userInfo.get("newPassword") != null) {
             if (userInfo.get("newPassword").isEmpty())
                 throw new ApiRequestException("Password cannot be empty");
-            if(Objects.equals(updateUser.getPassword(), userInfo.get("newPassword")))
+            if (Objects.equals(updateUser.getPassword(), userInfo.get("newPassword")))
                 throw new ApiRequestException("The password cannot be the same!");
 
             updateUser.setPassword(passwordEncoder.encode(userInfo.get("newPassword")));
@@ -243,9 +277,22 @@ public class UserController {
         return userService.save(updateUser);
     }
 
-    @DeleteMapping("/api/users/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
+    @DeleteMapping(value = "/api/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id, Principal principal) {
+        log.debug("Entering delete user endpoint");
+
+        //TODO check if is the same user or it is an ADMIN
+
+        try {
+            userService.deleteById(id);
+
+            log.info("User with id=" + id + ", was deleted.");
+
+            return new ResponseEntity<>("{\"message\":\"User deleted successfully\"", HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Unable to delete user with id=" + id + ", message: " + e.getMessage());
+            throw new ApiRequestException("Something went wrong!");
+        }
     }
 
     @GetMapping("/api/users/statistics/lastWeekTotalPerDays")
@@ -277,7 +324,7 @@ public class UserController {
     }
 
     @GetMapping("/api/users/statistics/totalSpent")
-    public Map<String, Object> getTotalSpent(Principal principal){
+    public Map<String, Object> getTotalSpent(Principal principal) {
         Long userId = userService.findByUsername(principal.getName()).getId();
 
         return expenseService.totalSpent(userId);
