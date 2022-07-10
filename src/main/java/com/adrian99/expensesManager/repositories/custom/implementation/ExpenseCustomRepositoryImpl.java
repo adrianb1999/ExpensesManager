@@ -42,8 +42,8 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
 
         queryFactory.delete(expense)
                 .where(
-                        expense.id.eq(expenseId).and(
-                                expense.users.id.eq(userId)))
+                        expense.id.eq(expenseId)
+                                .and(expense.users.id.eq(userId)))
                 .execute();
     }
 
@@ -73,6 +73,10 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
                             }
                         })
                 .collect(Collectors.toList());
+
+        if(list.size() == 0)
+            return null;
+
         for (int i = 0; i < dateList.size(); i++) {
 
             int finalI = i;
@@ -102,8 +106,12 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
                 .groupBy(expense.date.yearMonth(), expense.category)
                 .fetch().stream().sorted(listComparator).collect(Collectors.toList());
 
+        if(fetch.size() == 0)
+            return null;
+
         List<Map<String, Object>> mapList = new ArrayList<>();
         Double totalMonth;
+
         for (int i = 0; i < fetch.size(); i++) {
             totalMonth = 0D;
             Map<String, Object> currentMap = new HashMap<>();
@@ -114,16 +122,18 @@ public class ExpenseCustomRepositoryImpl implements ExpenseCustomRepository {
             Map<Category, Double> categoryDoubleMap = new HashMap<>();
 
             while (Objects.equals(fetch.get(i).get(0, Integer.class), currentYearMonth)) {
+
                 totalMonth += fetch.get(i).get(2, Double.class);
                 categoryDoubleMap.put(fetch.get(i).get(1, Category.class), fetch.get(i).get(2, Double.class));
+
                 if (i + 1 < fetch.size())
                     i++;
                 else
                     break;
                 if (i == fetch.size() - 1)
                     break;
-
             }
+
             currentMap.put("total", totalMonth);
             currentMap.put("categories", categoryDoubleMap);
             mapList.add(currentMap);
