@@ -19,3 +19,7 @@ services:
       POSTGRES_USER: postman
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: expensesDB
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+volumes:
+  pgdata:
